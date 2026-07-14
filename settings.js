@@ -2,7 +2,9 @@ const settings = {
     "minecraft_version": "auto", // or specific version like "1.21.6"
     "host": "127.0.0.1", // or "localhost", "your.ip.address.here"
     "port": 55916, // set to -1 to automatically scan for open ports
-    "auth": "offline", // or "microsoft"
+    "auth": "offline", // "offline", "microsoft", or "yggdrasil" for authlib-injector skin sites
+    "yggdrasil_server": "", // API root, e.g. "https://littleskin.cn/api/yggdrasil"
+    "yggdrasil_account": "", // optional key in keys.json > YGGDRASIL_ACCOUNTS; defaults to the profile name
 
     // the mindserver manages all agents and hosts the UI
     "mindserver_port": 8080,

@@ -15,5 +15,12 @@
     "NOVITA_API_KEY": "",
     "OPENROUTER_API_KEY": "",
     "CEREBRAS_API_KEY": "",
-    "MERCURY_API_KEY":""
+    "MERCURY_API_KEY":"",
+    "YGGDRASIL_ACCOUNTS": {
+        "andy": {
+            "username": "your-skin-site-login",
+            "password": "your-skin-site-password",
+            "profile": "andy"
+        }
+    }
 }

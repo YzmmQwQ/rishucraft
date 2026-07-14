@@ -7,6 +7,7 @@ import { plugin as pvp } from 'mineflayer-pvp';
 import { plugin as collectblock } from 'mineflayer-collectblock';
 import { plugin as autoEat } from 'mineflayer-auto-eat';
 import plugin from 'mineflayer-armor-manager';
+import { createYggdrasilAuth, resolveYggdrasilConfig } from './yggdrasil.js';
 const armorManager = plugin;
 let mc_version = settings.minecraft_version;
 let mcdata = null;
@@ -60,6 +61,12 @@ export function initBot(username) {
         auth: settings.auth,
         version: mc_version,
         checkTimeoutInterval: 60000,  // 60s keep-alive check (default 30s) — reduces disconnects on slow servers
+    };
+    if (settings.auth === 'yggdrasil') {
+        const yggdrasil = resolveYggdrasilConfig(username);
+        options.auth = createYggdrasilAuth(yggdrasil);
+        options.sessionServer = yggdrasil.sessionServer;
+        options.haveCredentials = true;
     }
     if (!mc_version || mc_version === "auto") {
         delete options.version;

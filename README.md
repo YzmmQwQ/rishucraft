@@ -3,175 +3,210 @@
   <a href="https://trendshift.io/repositories/14816" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14816" alt="mindcraft-bots%2Fmindcraft | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </h1>
 
-<p align="center">Crafting minds for Minecraft with LLMs and <a href="https://prismarinejs.github.io/mineflayer/#/">Mineflayer!</a></p>
+<p align="center">使用 LLM 和 <a href="https://prismarinejs.github.io/mineflayer/#/">Mineflayer</a> 为 Minecraft 打造智能体！</p>
 
 <p align="center">
-  <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md">FAQ</a> | 
-  <a href="https://discord.gg/mp73p35dzC">Discord Support</a> | 
-  <a href="https://www.youtube.com/watch?v=gRotoL8P8D8">Video Tutorial</a> | 
-  <a href="https://kolbynottingham.com/mindcraft/">Blog Post</a> | 
-  <a href="https://mindcraft-minecollab.github.io/index.html">Paper Website</a> | 
+  <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md">常见问题</a> |
+  <a href="https://discord.gg/mp73p35dzC">Discord 支持</a> |
+  <a href="https://www.youtube.com/watch?v=gRotoL8P8D8">视频教程</a> |
+  <a href="https://kolbynottingham.com/mindcraft/">博客文章</a> |
+  <a href="https://mindcraft-minecollab.github.io/index.html">论文网站</a> |
   <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/minecollab.md">MineCollab</a>
 </p>
 
-> [!Caution]
-Do not connect this bot to public servers with coding enabled. This project allows an LLM to write/execute code on your computer. The code is sandboxed, but still vulnerable to injection attacks. Code writing is disabled by default, you can enable it by setting `allow_insecure_coding` to `true` in `settings.js`. Ye be warned.
+## 项目来源与许可证
 
-# Getting Started
-## Requirements
+**RishuCraft 是 [Mindcraft](https://github.com/mindcraft-bots/mindcraft) 的衍生分支（fork）**，在其基础上进行中文本地化、功能扩展和兼容性调整。原始项目由 Kolby Nottingham 及 Mindcraft 贡献者开发；上游项目名称、链接和原作者信息在此明确保留。
 
-- [Minecraft Java Edition](https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc) (up to v1.21.11, recommend v1.21.6)
-- [Node.js Installed](https://nodejs.org/) (Node v18 or v20 LTS recommended. Node v24+ may cause issues with native dependencies)
-- At least one API key from a supported API provider. See [supported APIs](#model-customization). OpenAI is the default.
+本分支及其修改继续按照 [MIT License](LICENSE) 发布。MIT 许可证允许使用、复制、修改、合并、发布和再分发，但再分发本项目或其重要部分时，必须同时保留 `LICENSE` 中的原版权声明和许可声明。本仓库的修改不代表上游 Mindcraft 项目或其维护者的官方立场。
 
-> [!Important]
-> If installing node on windows, ensure you check `Automatically install the necessary tools`
+> [!CAUTION]
+> 不要在启用代码编写功能时将此机器人连接到公共服务器。本项目允许 LLM 在你的计算机上编写并执行代码。代码虽然运行在沙箱中，但仍可能受到提示词注入攻击。代码编写功能默认关闭；如需启用，请在 `settings.js` 中将 `allow_insecure_coding` 设置为 `true`。请充分了解其中的风险。
+
+# 快速开始
+
+## 环境要求
+
+- [Minecraft Java 版](https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc)（最高支持 v1.21.11，推荐 v1.21.6）
+- [Node.js](https://nodejs.org/)（最低 v22.13.0，推荐使用 Node v22 LTS）
+- 至少一个受支持 API 提供商的 API Key。请参阅[支持的 API](#模型定制)。默认使用 OpenAI。
+
+> [!IMPORTANT]
+> 在 Windows 上安装 Node.js 时，请确保勾选 `Automatically install the necessary tools`（自动安装所需工具）。
 >
-> If you encounter `npm install` errors on macOS, see the [FAQ](FAQ.md#common-issues) for troubleshooting native module build issues
+> 如果在 macOS 上运行 `npm install` 时遇到错误，请参阅 [FAQ](FAQ.md#common-issues) 排查原生模块的构建问题。
 
-## Install and Run
+## 安装与运行
 
-1. Make sure you have the requirements above.
+1. 确认已经满足上述环境要求。
 
-2. Download the [latest release](https://github.com/mindcraft-bots/mindcraft/releases/latest) and unzip it, or clone the repository.
+2. 下载并解压[最新发行版](https://github.com/mindcraft-bots/mindcraft/releases/latest)，或者克隆本仓库。
 
-3. Rename `keys.example.json` to `keys.json` and fill in your API keys (you only need one). The desired model is set in `andy.json` or other profiles. For other models refer to the table below.
+3. 将 `keys.example.json` 重命名为 `keys.json`，然后填入 API Key（只需配置一个）。目标模型在 `andy.json` 或其他 Profile 中设置；其他模型请参考下方表格。
 
-4. In terminal/command prompt, run `npm install` from the installed directory
+4. 在项目目录中打开终端或命令提示符，运行 `npm install`。
 
-5. Start a minecraft world and open it to LAN on localhost port `55916`
+5. 启动一个 Minecraft 世界，并通过局域网开放到本机端口 `55916`。
 
-6. Run `node main.js` from the installed directory
+6. 在项目目录中运行 `node main.js`。
 
-If you encounter issues, check the [FAQ](https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md) or find support on [discord](https://discord.gg/mp73p35dzC). We are currently not very responsive to github issues. To run tasks please refer to [Minecollab Instructions](minecollab.md#installation)
+如果遇到问题，请查看 [FAQ](https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md)，或前往 [Discord](https://discord.gg/mp73p35dzC) 寻求支持。目前我们回复 GitHub Issue 的速度较慢。如需运行任务，请参阅 [MineCollab 说明](minecollab.md#installation)。
 
+# 配置
 
-# Configuration
-## Model Customization
+## 模型定制
 
-You can configure project details in `settings.js`. [See file.](settings.js)
+你可以在 `settings.js` 中配置项目参数，[查看该文件](settings.js)。
 
-You can configure the agent's name, model, and prompts in their profile like `andy.json`. The model can be specified with the `model` field, with values like `model: "gemini-2.5-pro"`. You will need the correct API key for the API provider you choose. See all supported APIs below.
+你可以在 `andy.json` 等 Profile 中配置 Agent 的名称、模型和提示词。模型通过 `model` 字段指定，例如 `"model": "gemini-2.5-pro"`。你需要为所选 API 提供商配置正确的 API Key。所有支持的 API 如下。
 
 <details>
-<summary><strong>⭐ VIEW SUPPORTED APIs ⭐</strong></summary>
+<summary><strong>⭐ 查看支持的 API ⭐</strong></summary>
 
-| API Name | Config Variable| Docs |
+| API 名称 | 配置变量 | 文档 |
 |------|------|------|
-| `openai` | `OPENAI_API_KEY` | [docs](https://platform.openai.com/docs/models) |
-| `google` | `GEMINI_API_KEY` | [docs](https://ai.google.dev/gemini-api/docs/models/gemini) |
-| `anthropic` | `ANTHROPIC_API_KEY` | [docs](https://docs.anthropic.com/claude/docs/models-overview) |
-| `xai` | `XAI_API_KEY` | [docs](https://docs.x.ai/docs) |
-| `deepseek` | `DEEPSEEK_API_KEY` | [docs](https://api-docs.deepseek.com/) |
-| `ollama` (local) | n/a | [docs](https://ollama.com/library) |
-| `qwen` | `QWEN_API_KEY` | [Intl.](https://www.alibabacloud.com/help/en/model-studio/developer-reference/use-qwen-by-calling-api)/[cn](https://help.aliyun.com/zh/model-studio/getting-started/models) |
-| `mistral` | `MISTRAL_API_KEY` | [docs](https://docs.mistral.ai/getting-started/models/models_overview/) |
-| `replicate` | `REPLICATE_API_KEY` | [docs](https://replicate.com/collections/language-models) |
-| `groq` (not grok) | `GROQCLOUD_API_KEY` | [docs](https://console.groq.com/docs/models) |
-| `huggingface` | `HUGGINGFACE_API_KEY` | [docs](https://huggingface.co/models) |
-| `novita` | `NOVITA_API_KEY` | [docs](https://novita.ai/model-api/product/llm-api?utm_source=github_mindcraft&utm_medium=github_readme&utm_campaign=link) |
-| `openrouter` | `OPENROUTER_API_KEY` | [docs](https://openrouter.ai/models) |
-| `glhf` | `GHLF_API_KEY` | [docs](https://glhf.chat/user-settings/api) |
-| `hyperbolic` | `HYPERBOLIC_API_KEY` | [docs](https://docs.hyperbolic.xyz/docs/getting-started) |
-| `vllm` | n/a | n/a |
-| `cerebras` | `CEREBRAS_API_KEY` | [docs](https://inference-docs.cerebras.ai/introduction) |
-| `mercury` | `MERCURY_API_KEY` | [docs](https://www.inceptionlabs.ai/) |
+| `openai` | `OPENAI_API_KEY` | [文档](https://platform.openai.com/docs/models) |
+| `google` | `GEMINI_API_KEY` | [文档](https://ai.google.dev/gemini-api/docs/models/gemini) |
+| `anthropic` | `ANTHROPIC_API_KEY` | [文档](https://docs.anthropic.com/claude/docs/models-overview) |
+| `xai` | `XAI_API_KEY` | [文档](https://docs.x.ai/docs) |
+| `deepseek` | `DEEPSEEK_API_KEY` | [文档](https://api-docs.deepseek.com/) |
+| `ollama`（本地） | 不适用 | [文档](https://ollama.com/library) |
+| `qwen` | `QWEN_API_KEY` | [国际版](https://www.alibabacloud.com/help/en/model-studio/developer-reference/use-qwen-by-calling-api)/[中国版](https://help.aliyun.com/zh/model-studio/getting-started/models) |
+| `mistral` | `MISTRAL_API_KEY` | [文档](https://docs.mistral.ai/getting-started/models/models_overview/) |
+| `replicate` | `REPLICATE_API_KEY` | [文档](https://replicate.com/collections/language-models) |
+| `groq`（不是 grok） | `GROQCLOUD_API_KEY` | [文档](https://console.groq.com/docs/models) |
+| `huggingface` | `HUGGINGFACE_API_KEY` | [文档](https://huggingface.co/models) |
+| `novita` | `NOVITA_API_KEY` | [文档](https://novita.ai/model-api/product/llm-api?utm_source=github_mindcraft&utm_medium=github_readme&utm_campaign=link) |
+| `openrouter` | `OPENROUTER_API_KEY` | [文档](https://openrouter.ai/models) |
+| `glhf` | `GHLF_API_KEY` | [文档](https://glhf.chat/user-settings/api) |
+| `hyperbolic` | `HYPERBOLIC_API_KEY` | [文档](https://docs.hyperbolic.xyz/docs/getting-started) |
+| `vllm` | 不适用 | 不适用 |
+| `cerebras` | `CEREBRAS_API_KEY` | [文档](https://inference-docs.cerebras.ai/introduction) |
+| `mercury` | `MERCURY_API_KEY` | [文档](https://www.inceptionlabs.ai/) |
 
 </details>
 
-For more comprehensive model configuration and syntax, see [Model Specifications](#model-specifications).
+更完整的模型配置方式和语法，请参阅[模型规格](#模型规格)。
 
-For local models we support [ollama](https://ollama.com/) and we provide our own finetuned models for you to use. 
-To install our models, install ollama and run the following terminal command:
+本项目通过 [Ollama](https://ollama.com/) 支持本地模型，并提供了经过微调的模型。安装 Ollama 后，运行以下命令安装这些模型：
+
 ```bash
 ollama pull sweaterdog/andy-4:micro-q8_0 && ollama pull embeddinggemma
 ```
 
-## Online Servers
-To connect to online servers your bot will need an official Microsoft/Minecraft account. You can use your own personal one, but will need another account if you want to connect too and play with it. To connect, change these lines in `settings.js`:
+## 在线服务器
+
+要连接在线服务器，机器人需要一个正版 Microsoft/Minecraft 账号。你可以使用自己的账号，但如果还想同时以玩家身份进入服务器，则需要另一个账号。请在 `settings.js` 中修改以下配置：
+
 ```javascript
 "host": "111.222.333.444",
 "port": 55920,
 "auth": "microsoft",
 
-// rest is same...
+// 其余配置保持不变……
 ```
-> [!Important]
-> The bot's name in the profile.json must exactly match the Minecraft profile name! Otherwise the bot will spam talk to itself.
 
-To use different accounts, Mindcraft will connect with the account that the Minecraft launcher is currently using. You can switch accounts in the launcher, then run `node main.js`, then switch to your main account after the bot has connected.
+> [!IMPORTANT]
+> Profile JSON 中的机器人名称必须与 Minecraft Profile 名称完全一致，否则机器人会不断与自己对话。
 
-## Tasks
+使用不同账号时，Mindcraft 会连接 Minecraft 启动器当前登录的账号。你可以先在启动器中切换账号并运行 `node main.js`，等待机器人连接成功后，再切回你的主账号。
 
-Tasks automatically start the bot with a prompt and a goal item to acquire or blueprint to construct. To run a simple task that involves collecting 4 oak_logs run 
+### 外置登录（皮肤站 / authlib-injector）
 
-`node main.js --task_path tasks/basic/single_agent.json --task_id gather_oak_logs`
+Mindcraft 支持兼容 authlib-injector 的 Yggdrasil 皮肤站。先在 `settings.js` 中设置认证方式和皮肤站提供的 API 根地址：
 
-Here is an example task json format: 
-
+```javascript
+"auth": "yggdrasil",
+"yggdrasil_server": "https://littleskin.cn/api/yggdrasil",
 ```
-{
-    "gather_oak_logs": {
-      "goal": "Collect at least four logs",
-      "initial_inventory": {
-        "0": {
-          "wooden_axe": 1
-        }
-      },
-      "agent_count": 1,
-      "target": "oak_log",
-      "number_of_target": 4,
-      "type": "techtree",
-      "max_depth": 1,
-      "depth": 0,
-      "timeout": 300,
-      "blocked_actions": {
-        "0": [],
-        "1": []
-      },
-      "missing_items": [],
-      "requires_ctable": false
-    }
+
+然后在不会提交到 Git 的 `keys.json` 中配置账号。键名默认使用 Agent Profile 的 `name`；下面的 `andy` 对应 `andy.json` 中的 Agent 名称：
+
+```json
+"YGGDRASIL_ACCOUNTS": {
+  "andy": {
+    "username": "皮肤站登录名或邮箱",
+    "password": "皮肤站密码",
+    "profile": "皮肤站角色名"
+  }
 }
 ```
 
-The `initial_inventory` is what the bot will have at the start of the episode, `target` refers to the target item and `number_of_target` refers to the number of target items the agent needs to collect to successfully complete the task. 
+`profile` 用于账号拥有多个角色时选择角色；只有一个角色时可以省略。多个机器人需要在 `YGGDRASIL_ACCOUNTS` 中分别配置账号，并让各 Agent 名称与对应的键名一致。也可以在 Profile 中用 `"yggdrasil_account": "另一个键名"` 指定账号。请勿把真实密码写入 `settings.js`、Profile 或 `keys.example.json`。
 
-If you want more optimization and automatic launching of the minecraft world, you will need to follow the instructions in [Minecollab Instructions](minecollab.md#installation)
+## 任务
 
-## Docker Container
+任务会自动向机器人发送提示词，并指定需要获取的目标物品或需要建造的蓝图。以下命令会运行一个收集 4 个 `oak_log` 的简单任务：
 
-If you intend to `allow_insecure_coding`, it is a good idea to run the app in a docker container to reduce risks of running unknown code. This is strongly recommended before connecting to remote servers, although still does not guarantee complete safety.
+`node main.js --task_path tasks/basic/single_agent.json --task_id gather_oak_logs`
+
+任务 JSON 的格式示例如下：
+
+```json
+{
+  "gather_oak_logs": {
+    "goal": "Collect at least four logs",
+    "initial_inventory": {
+      "0": {
+        "wooden_axe": 1
+      }
+    },
+    "agent_count": 1,
+    "target": "oak_log",
+    "number_of_target": 4,
+    "type": "techtree",
+    "max_depth": 1,
+    "depth": 0,
+    "timeout": 300,
+    "blocked_actions": {
+      "0": [],
+      "1": []
+    },
+    "missing_items": [],
+    "requires_ctable": false
+  }
+}
+```
+
+`initial_inventory` 表示本轮任务开始时机器人拥有的物品；`target` 表示目标物品；`number_of_target` 表示成功完成任务所需收集的目标物品数量。
+
+如果需要更多优化功能以及自动启动 Minecraft 世界，请按照 [MineCollab 说明](minecollab.md#installation)进行配置。
+
+## Docker 容器
+
+如果准备启用 `allow_insecure_coding`，建议在 Docker 容器中运行应用，以降低执行未知代码的风险。连接远程服务器之前强烈建议这样做，但 Docker 仍不能保证绝对安全。
 
 ```bash
 docker build -t mindcraft . && docker run --rm --add-host=host.docker.internal:host-gateway -p 8080:8080 -p 3000-3003:3000-3003 -e SETTINGS_JSON='{"auto_open_ui":false,"profiles":["./profiles/gemini.json"],"host":"host.docker.internal"}' --volume ./keys.json:/app/keys.json --name mindcraft mindcraft
 ```
-or simply
+
+或者直接运行：
+
 ```bash
 docker-compose up --build
 ```
 
-When running in docker, if you want the bot to join your local minecraft server, you have to use a special host address `host.docker.internal` to call your localhost from inside your docker container. Put this into your [settings.js](settings.js):
+在 Docker 中运行时，如果希望机器人加入本机 Minecraft 服务器，需要通过特殊主机地址 `host.docker.internal` 从容器访问宿主机。请在 [settings.js](settings.js) 中加入以下配置：
 
 ```javascript
-"host": "host.docker.internal", // instead of "localhost", to join your local minecraft from inside the docker container
+"host": "host.docker.internal", // 使用该地址代替 "localhost"，从容器连接宿主机上的 Minecraft
 ```
 
-To connect to an unsupported minecraft version, you can try to use [viaproxy](services/viaproxy/README.md)
+如需连接尚未受支持的 Minecraft 版本，可以尝试使用 [ViaProxy](services/viaproxy/README.md)。
 
-# Bot Profiles
+# 机器人 Profile
 
-Bot profiles are json files (such as `andy.json`) that define:
+机器人 Profile 是 `andy.json` 这类 JSON 文件，用于定义：
 
-1. Bot backend LLMs to use for talking, coding, and embedding.
-2. Prompts used to influence the bot's behavior.
-3. Examples help the bot perform tasks.
+1. 机器人对话、代码编写和嵌入所使用的后端 LLM。
+2. 影响机器人行为的提示词。
+3. 帮助机器人完成任务的示例。
 
-## Model Specifications
+## 模型规格
 
-LLM models can be specified simply as `"model": "gpt-5.4"`, or more specifically with `"{api}/{model}"`, like `"openrouter/google/gemini-2.5-pro"`. See all supported APIs [here](#model-customization).
+LLM 模型可以简单指定为 `"model": "gpt-5.4"`，也可以使用更明确的 `"{api}/{model}"` 格式，例如 `"openrouter/google/gemini-2.5-pro"`。所有支持的 API 请参阅[模型定制](#模型定制)。
 
-The `model` field can be a string or an object. A model object must specify an `api`, and optionally a `model`, `url`, and additional `params`. You can also use different models/providers for chatting, coding, vision, embedding, and voice synthesis. See the example below.
+`model` 字段可以是字符串或对象。模型对象必须指定 `api`，还可选填 `model`、`url` 和额外的 `params`。你也可以为对话、代码编写、视觉、嵌入和语音合成分别使用不同模型或提供商。示例如下：
 
 ```json
 "model": {
@@ -201,44 +236,45 @@ The `model` field can be a string or an object. A model object must specify an `
 "speak_model": "openai/tts-1/echo"
 ```
 
-`model` is used for chat, `code_model` is used for newAction coding, `vision_model` is used for image interpretation, `embedding` is used to embed text for example selection, and `speak_model` is used for voice synthesis. `model` will be used by default for all other models if not specified. Not all APIs support embeddings, vision, or voice synthesis.
+`model` 用于对话，`code_model` 用于 `newAction` 代码编写，`vision_model` 用于图像理解，`embedding` 用于对文本进行嵌入以选择示例，`speak_model` 用于语音合成。如果没有单独指定，其他模型默认使用 `model`。并非所有 API 都支持嵌入、视觉或语音合成。
 
-All apis have default models and urls, so those fields are optional. The `params` field is optional and can be used to specify additional parameters for the model. It accepts any key-value pairs supported by the api. Is not supported for embedding models.
+所有 API 都有默认模型和 URL，因此这些字段可以省略。`params` 字段也是可选的，可传入对应 API 支持的任意附加参数，但嵌入模型不支持该字段。
 
-## Embedding Models
+## 嵌入模型
 
-Embedding models are used to embed and efficiently select relevant examples for conversation and coding.
+嵌入模型用于向量化文本，以便高效选择与对话和代码编写相关的示例。
 
-Supported Embedding APIs: `openai`, `google`, `replicate`, `huggingface`, `novita`
+支持的嵌入 API：`openai`、`google`、`replicate`、`huggingface`、`novita`
 
-If you try to use an unsupported model, then it will default to a simple word-overlap method. Expect reduced performance. We recommend using supported embedding APIs.
+如果使用不受支持的模型，系统将回退到简单的词语重叠算法，性能可能下降。建议使用受支持的嵌入 API。
 
-## Voice Synthesis Models
+## 语音合成模型
 
-Voice synthesis models are used to narrate bot responses and specified with `speak_model`. This field is parsed differently than other models and only supports strings formatted as `"{api}/{model}/{voice}"`, like `"openai/tts-1/echo"`. We only support `openai` and `google` for voice synthesis.
+语音合成模型用于朗读机器人回复，通过 `speak_model` 指定。该字段的解析方式与其他模型不同，只支持 `"{api}/{model}/{voice}"` 格式的字符串，例如 `"openai/tts-1/echo"`。语音合成目前仅支持 `openai` 和 `google`。
 
-## Specifying Profiles via Command Line
+## 通过命令行指定 Profile
 
-By default, the program will use the profiles specified in `settings.js`. You can specify one or more agent profiles using the `--profiles` argument: `node main.js --profiles ./profiles/andy.json ./profiles/jill.json`
+程序默认使用 `settings.js` 中指定的 Profile。你可以通过 `--profiles` 参数指定一个或多个 Agent Profile：`node main.js --profiles ./profiles/andy.json ./profiles/jill.json`
 
+# 参与贡献
 
-# Contributing
+欢迎为本项目做出贡献！相比 GitHub Issue，我们通常会更快处理 Pull Request。你也可以加入 [Discord](https://discord.gg/mp73p35dzC) 获取更及时的支持和开发方向。
 
-We welcome contributions to the project! We are generally less responsive to github issues, and more responsive to pull requests. Join the [discord](https://discord.gg/mp73p35dzC) for more active support and direction.
+本项目允许使用 AI 生成的代码，但请务必仔细审查。大量提交未经检查的低质量代码和文档会直接妨碍项目开发。
 
-While AI generated code is allowed, please vet it carefully. Submitting tons of sloppy code and documentation actively harms development.
+## 补丁
 
-## Patches
+本项目依赖的部分 Node 模块存在缺陷。如需添加补丁，请先修改本地 `node_modules` 中对应模块的文件，然后运行 `npx patch-package [package-name]`。
 
-Some of the node modules that we depend on have bugs in them. To add a patch, change your local node module file and run `npx patch-package [package-name]`
+## 开发团队
 
-## Development Team
-Thanks to all who contributed to the project, especially the official development team: [@MaxRobinsonTheGreat](https://github.com/MaxRobinsonTheGreat), [@kolbytn](https://github.com/kolbytn), [@icwhite](https://github.com/icwhite), [@Sweaterdog](https://github.com/Sweaterdog), [@Ninot1Quyi](https://github.com/Ninot1Quyi), [@riqvip](https://github.com/riqvip), [@uukelele-scratch](https://github.com/uukelele-scratch), [@mrelmida](https://github.com/mrelmida)
+感谢所有为本项目做出贡献的人，特别是官方开发团队：[@MaxRobinsonTheGreat](https://github.com/MaxRobinsonTheGreat)、[@kolbytn](https://github.com/kolbytn)、[@icwhite](https://github.com/icwhite)、[@Sweaterdog](https://github.com/Sweaterdog)、[@Ninot1Quyi](https://github.com/Ninot1Quyi)、[@riqvip](https://github.com/riqvip)、[@uukelele-scratch](https://github.com/uukelele-scratch)、[@mrelmida](https://github.com/mrelmida)。
 
+## 引用
 
-## Citation:
-This work is published in the paper [Collaborating Action by Action: A Multi-agent LLM Framework for Embodied Reasoning](https://arxiv.org/abs/2504.17950). Please use this citation if you use this project in your research:
-```
+本项目成果发表于论文 [Collaborating Action by Action: A Multi-agent LLM Framework for Embodied Reasoning](https://arxiv.org/abs/2504.17950)。如果你在研究中使用本项目，请引用：
+
+```bibtex
 @article{mindcraft2025,
   title = {Collaborating Action by Action: A Multi-agent LLM Framework for Embodied Reasoning},
   author = {White*, Isadora and Nottingham*, Kolby and Maniar, Ayush and Robinson, Max and Lillemark, Hansen and Maheshwari, Mehul and Qin, Lianhui and Ammanabrolu, Prithviraj},
@@ -248,8 +284,8 @@ This work is published in the paper [Collaborating Action by Action: A Multi-age
 }
 ```
 
-## Contributors
+## 贡献者
 
-Thanks to everyone who has submitted issues on and off Github, made suggestions, and generally helped make this a better project.
+感谢所有在 GitHub 及其他渠道提交问题、提出建议并帮助本项目不断完善的人。
 
-![Contributors](https://contrib.rocks/image?repo=mindcraft-bots/mindcraft)
+![贡献者](https://contrib.rocks/image?repo=mindcraft-bots/mindcraft)

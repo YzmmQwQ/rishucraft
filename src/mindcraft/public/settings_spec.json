@@ -23,7 +23,17 @@
         "type": "string",
         "description": "The authentication method to use",
         "default": "offline",
-        "options": ["offline", "microsoft"]
+        "options": ["offline", "microsoft", "yggdrasil"]
+    },
+    "yggdrasil_server": {
+        "type": "string",
+        "description": "The authlib-injector/Yggdrasil API root URL used when auth is yggdrasil",
+        "default": ""
+    },
+    "yggdrasil_account": {
+        "type": "string",
+        "description": "Optional account key in keys.json > YGGDRASIL_ACCOUNTS. Defaults to the agent profile name.",
+        "default": ""
     },
     "base_profile": {
         "type": "string",
