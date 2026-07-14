@@ -1,23 +1,16 @@
-<h1 align="center">🧠mindcraft⛏️</h1>
-<h1 align="center">
-  <a href="https://trendshift.io/repositories/14816" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14816" alt="mindcraft-bots%2Fmindcraft | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</h1>
+# 🍐RishuCRAFT NEXT
 
-<p align="center">使用 LLM 和 <a href="https://prismarinejs.github.io/mineflayer/#/">Mineflayer</a> 为 Minecraft 打造智能体！</p>
+拟人化的 AI Minecraft Player，基于广大 LLM 和 <a href="https://prismarinejs.github.io/mineflayer/#/">Mineflayer</a>。
 
 <p align="center">
-  <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md">常见问题</a> |
-  <a href="https://discord.gg/mp73p35dzC">Discord 支持</a> |
-  <a href="https://www.youtube.com/watch?v=gRotoL8P8D8">视频教程</a> |
-  <a href="https://kolbynottingham.com/mindcraft/">博客文章</a> |
-  <a href="https://mindcraft-minecollab.github.io/index.html">论文网站</a> |
-  <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/minecollab.md">MineCollab</a>
+  <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/FAQ.md">F&Q</a> |
+  <a href="https://discord.gg/mp73p35dzC">社群</a> |
+  <a href="https://mindcraft-minecollab.github.io/index.html">网站</a> |
+  <a href="https://github.com/mindcraft-bots/mindcraft/blob/main/minecollab.md">提点建议</a>
 </p>
 
 ## 项目来源与许可证
-
-**RishuCraft 是 [Mindcraft](https://github.com/mindcraft-bots/mindcraft) 的衍生分支（fork）**，在其基础上进行中文本地化、功能扩展和兼容性调整。原始项目由 Kolby Nottingham 及 Mindcraft 贡献者开发；上游项目名称、链接和原作者信息在此明确保留。
-
+RishuCraft 是 [Mindcraft](https://github.com/mindcraft-bots/mindcraft) 的衍生分支（fork），在其基础上进行中文本地化、功能扩展和兼容性调整。原始项目由 Kolby Nottingham 及 Mindcraft 贡献者开发；上游项目名称、链接和原作者信息在此明确保留。
 本分支及其修改继续按照 [MIT License](LICENSE) 发布。MIT 许可证允许使用、复制、修改、合并、发布和再分发，但再分发本项目或其重要部分时，必须同时保留 `LICENSE` 中的原版权声明和许可声明。本仓库的修改不代表上游 Mindcraft 项目或其维护者的官方立场。
 
 > [!CAUTION]
