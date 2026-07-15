@@ -43,6 +43,12 @@ export class Prompter {
         }
         // base overrides default, individual overrides base
 
+        // `chat_prompt` is the user-facing alias for the conversation prompt.
+        // Keep `conversing` supported for backwards compatibility.
+        if (typeof this.profile.chat_prompt === 'string' && this.profile.chat_prompt.trim()) {
+            this.profile.conversing = this.profile.chat_prompt;
+        }
+
         this.convo_examples = null;
         this.coding_examples = null;
         
@@ -56,15 +62,26 @@ export class Prompter {
         if (this.profile.max_tokens)
             max_tokens = this.profile.max_tokens;
 
-        let chat_model_profile = selectAPI(this.profile.model);
+        const legacy_model = this.profile.model;
+        const chat_model_config = this.profile.chat_model ?? legacy_model;
+        const plan_model_config = this.profile.plan_model ?? legacy_model ?? chat_model_config;
+
+        if (!chat_model_config) {
+            throw new Error('Profile must define `chat_model` (or legacy `model`).');
+        }
+
+        let chat_model_profile = selectAPI(chat_model_config);
         this.chat_model = createModel(chat_model_profile);
+
+        let plan_model_profile = selectAPI(plan_model_config);
+        this.plan_model = createModel(plan_model_profile);
 
         if (this.profile.code_model) {
             let code_model_profile = selectAPI(this.profile.code_model);
             this.code_model = createModel(code_model_profile);
         }
         else {
-            this.code_model = this.chat_model;
+            this.code_model = this.plan_model;
         }
 
         if (this.profile.vision_model) {
@@ -72,7 +89,7 @@ export class Prompter {
             this.vision_model = createModel(vision_model_profile);
         }
         else {
-            this.vision_model = this.chat_model;
+            this.vision_model = this.plan_model;
         }
 
         
@@ -88,7 +105,11 @@ export class Prompter {
             this.embedding_model = createModel(embedding_model_profile);
         }
         else {
-            this.embedding_model = createModel({api: chat_model_profile.api});
+            this.embedding_model = createModel({
+                api: plan_model_profile.api,
+                url: plan_model_profile.url,
+                params: plan_model_profile.params
+            });
         }
 
         this.skill_libary = new SkillLibrary(agent, this.embedding_model);
@@ -281,7 +302,7 @@ export class Prompter {
         await this.checkCooldown();
         let prompt = this.profile.saving_memory;
         prompt = await this.replaceStrings(prompt, null, null, to_summarize);
-        let resp = await this.chat_model.sendRequest([], prompt);
+        let resp = await this.plan_model.sendRequest([], prompt);
         await this._saveLog(prompt, to_summarize, resp, 'memSaving');
         if (resp?.includes('</think>')) {
             const [_, afterThink] = resp.split('</think>')
@@ -296,7 +317,7 @@ export class Prompter {
         let messages = this.agent.history.getHistory();
         messages.push({role: 'user', content: new_message});
         prompt = await this.replaceStrings(prompt, null, null, messages);
-        let res = await this.chat_model.sendRequest([], prompt);
+        let res = await this.plan_model.sendRequest([], prompt);
         return res.trim().toLowerCase() === 'respond';
     }
 
@@ -317,7 +338,7 @@ export class Prompter {
         user_message = await this.replaceStrings(user_message, messages, null, null, last_goals);
         let user_messages = [{role: 'user', content: user_message}];
 
-        let res = await this.chat_model.sendRequest(user_messages, system_message);
+        let res = await this.plan_model.sendRequest(user_messages, system_message);
 
         let goal = null;
         try {

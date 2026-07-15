@@ -53,7 +53,7 @@ RishuCraft 是 [Mindcraft](https://github.com/mindcraft-bots/mindcraft) 的衍�
 
 你可以在 `settings.js` 中配置项目参数，[查看该文件](settings.js)。
 
-你可以在 `andy.json` 等 Profile 中配置 Agent 的名称、模型和提示词。模型通过 `model` 字段指定，例如 `"model": "gemini-2.5-pro"`。你需要为所选 API 提供商配置正确的 API Key。所有支持的 API 如下。
+你可以在 `andy.json` 等 Profile 中配置 Agent 的名称、模型和提示词。对话与规划模型分别通过 `chat_model`、`plan_model` 指定；旧 `model` 字段仍兼容。你需要为所选 API 提供商配置正确的 API Key。所有支持的 API 如下。
 
 <details>
 <summary><strong>⭐ 查看支持的 API ⭐</strong></summary>
@@ -193,18 +193,23 @@ docker-compose up --build
 
 机器人 Profile 是 `andy.json` 这类 JSON 文件，用于定义：
 
-1. 机器人对话、代码编写和嵌入所使用的后端 LLM。
+1. 机器人对话、规划、代码编写和嵌入所使用的后端 LLM。
 2. 影响机器人行为的提示词。
 3. 帮助机器人完成任务的示例。
 
 ## 模型规格
 
-LLM 模型可以简单指定为 `"model": "gpt-5.4"`，也可以使用更明确的 `"{api}/{model}"` 格式，例如 `"openrouter/google/gemini-2.5-pro"`。所有支持的 API 请参阅[模型定制](#模型定制)。
+聊天和规划模型分别通过 `chat_model` 与 `plan_model` 指定。模型可以是简单字符串，例如 `"gpt-5.4"`，也可以使用更明确的 `"{api}/{model}"` 格式，例如 `"openrouter/google/gemini-2.5-pro"`。旧版 `model` 字段仍作为两者的兼容回退。
 
-`model` 字段可以是字符串或对象。模型对象必须指定 `api`，还可选填 `model`、`url` 和额外的 `params`。你也可以为对话、代码编写、视觉、嵌入和语音合成分别使用不同模型或提供商。示例如下：
+模型字段可以是字符串或对象。模型对象必须指定 `api`，还可选填 `model`、`url` 和额外的 `params`。你可以为对话、规划、代码编写、视觉、嵌入和语音合成分别使用不同模型或提供商。示例如下：
 
 ```json
-"model": {
+"chat_model": {
+  "api": "openai",
+  "model": "gpt-5.4-mini",
+  "url": "https://api.openai.com/v1/"
+},
+"plan_model": {
   "api": "openai",
   "model": "gpt-5.4",
   "url": "https://api.openai.com/v1/",
@@ -231,7 +236,15 @@ LLM 模型可以简单指定为 `"model": "gpt-5.4"`，也可以使用更明确�
 "speak_model": "openai/tts-1/echo"
 ```
 
-`model` 用于对话，`code_model` 用于 `newAction` 代码编写，`vision_model` 用于图像理解，`embedding` 用于对文本进行嵌入以选择示例，`speak_model` 用于语音合成。如果没有单独指定，其他模型默认使用 `model`。并非所有 API 都支持嵌入、视觉或语音合成。
+`chat_model` 只用于生成日常对话回复；`plan_model` 用于记忆总结、目标规划和是否回应等非对话推理。`code_model` 用于 `newAction` 代码编写，`vision_model` 用于图像理解，`embedding` 用于对文本进行嵌入以选择示例，`speak_model` 用于语音合成。未配置 `code_model` 或 `vision_model` 时会回退到 `plan_model`。旧 `model` 会同时作为 `chat_model` 和 `plan_model` 的回退。
+
+可以通过 `chat_prompt` 自定义聊天提示词。留空或省略时使用项目内置提示词；填写后会完整替换内置的 `conversing` 提示词。支持 `$NAME`、`$MEMORY`、`$STATS`、`$INVENTORY`、`$COMMAND_DOCS`、`$EXAMPLES` 和 `$SELF_PROMPT` 等占位符：
+
+```json
+"chat_prompt": "你是 Minecraft 助手 $NAME。请使用简短自然的中文回复。\n$MEMORY\n$STATS\n$INVENTORY\n$COMMAND_DOCS\n$EXAMPLES\nConversation Begin:"
+```
+
+Profile 使用严格 JSON 格式，不能加入 `//` 或 `/* */` 注释。需要写配置说明时，可以像 `andy.json` 一样使用 `_comments` 字段；未使用的字段会被程序忽略。
 
 所有 API 都有默认模型和 URL，因此这些字段可以省略。`params` 字段也是可选的，可传入对应 API 支持的任意附加参数，但嵌入模型不支持该字段。
 

@@ -1,6 +1,15 @@
 {
+    "_comments": {
+        "chat_model": "只用于玩家日常对话。可以填写模型字符串，也可以填写包含 api、model、url、params 的对象。",
+        "plan_model": "用于记忆总结、目标规划和是否回应等非对话推理；未配置 code_model 或 vision_model 时也作为回退。",
+        "chat_prompt": "可选的自定义聊天提示词。留空使用项目内置提示词；填写后会完整替换内置聊天提示词。支持 $NAME、$MEMORY、$STATS、$INVENTORY、$COMMAND_DOCS、$EXAMPLES、$SELF_PROMPT 等占位符。",
+        "legacy_model": "旧字段 model 仍兼容，但新配置建议分别使用 chat_model 和 plan_model。"
+    },
     "name": "andy",
 
-    "model": "gpt-5.4-mini"
+    "chat_model": "gpt-5.4-mini",
+    "plan_model": "gpt-5.4-mini",
+
+    "chat_prompt": ""
 
 }
