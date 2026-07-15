@@ -1,15 +1,89 @@
 {
     "_comments": {
-        "chat_model": "只用于玩家日常对话。可以填写模型字符串，也可以填写包含 api、model、url、params 的对象。",
-        "plan_model": "用于记忆总结、目标规划和是否回应等非对话推理；未配置 code_model 或 vision_model 时也作为回退。",
-        "chat_prompt": "可选的自定义聊天提示词。留空使用项目内置提示词；填写后会完整替换内置聊天提示词。支持 $NAME、$MEMORY、$STATS、$INVENTORY、$COMMAND_DOCS、$EXAMPLES、$SELF_PROMPT 等占位符。",
-        "legacy_model": "旧字段 model 仍兼容，但新配置建议分别使用 chat_model 和 plan_model。"
+        "api": "提供商适配器。第三方 OpenAI 兼容接口统一填写 openai。",
+        "model": "提供商要求的准确模型 ID。",
+        "url": "API Base URL，通常以 /v1 结尾。每个用途可以使用不同 URL。",
+        "api_key": "这里填写 keys.json 中的字段名称，不要直接填写真实密钥。每个模型可以引用不同 Key。",
+        "params": "传给模型接口的额外生成参数；不同提供商支持的参数可能不同。",
+        "chat_model": "玩家日常对话模型。",
+        "plan_model": "记忆总结、目标规划和是否回应等非对话推理模型。",
+        "code_model": "newAction JavaScript 代码生成模型。",
+        "vision_model": "截图理解模型；还需要在 settings.js 中开启 allow_vision。",
+        "embedding": "文本向量模型，接口必须支持 POST /v1/embeddings。",
+        "speak_model": "语音合成模型；还需要在 settings.js 中开启 speak，并安装 ffplay。",
+        "chat_prompt": "自定义聊天提示词；留空使用内置提示词。支持 $NAME、$MEMORY、$STATS、$INVENTORY、$COMMAND_DOCS、$EXAMPLES、$SELF_PROMPT。"
     },
+
     "name": "andy",
 
-    "chat_model": "gpt-5.4-mini",
-    "plan_model": "gpt-5.4-mini",
+    "chat_model": {
+        "api": "openai",
+        "model": "gpt-5.4-mini",
+        "url": "https://api.openai.com/v1",
+        "api_key": "OPENAI_API_KEY",
+        "params": {
+            "temperature": 0.7,
+            "max_tokens": 1000
+        }
+    },
 
-    "chat_prompt": ""
+    "plan_model": {
+        "api": "openai",
+        "model": "gpt-5.4",
+        "url": "https://api.openai.com/v1",
+        "api_key": "OPENAI_API_KEY",
+        "params": {
+            "temperature": 0.2,
+            "max_tokens": 2000
+        }
+    },
 
+    "code_model": {
+        "api": "openai",
+        "model": "gpt-5.4-mini",
+        "url": "https://api.openai.com/v1",
+        "api_key": "OPENAI_API_KEY",
+        "params": {
+            "temperature": 0.1,
+            "max_tokens": 3000
+        }
+    },
+
+    "vision_model": {
+        "api": "openai",
+        "model": "gpt-5.4",
+        "url": "https://api.openai.com/v1",
+        "api_key": "OPENAI_API_KEY",
+        "params": {
+            "max_tokens": 1000
+        }
+    },
+
+    "embedding": {
+        "api": "openai",
+        "model": "text-embedding-3-small",
+        "url": "https://api.openai.com/v1",
+        "api_key": "OPENAI_API_KEY"
+    },
+
+    "speak_model": {
+        "api": "openai",
+        "model": "tts-1",
+        "voice": "echo",
+        "url": "https://api.openai.com/v1",
+        "api_key": "OPENAI_API_KEY"
+    },
+
+    "chat_prompt": "You are an AI Minecraft bot named $NAME that can converse with players, see, move, mine, build, and interact with the world by using commands.\n$SELF_PROMPT Be a friendly, casual, effective, and efficient robot. Be very brief in your responses, don't apologize constantly, don't give instructions or make lists unless asked, and don't refuse requests. Don't pretend to act, use commands immediately when requested. Do NOT say this: 'Sure, I've stopped. *stops*', instead say this: 'Sure, I'll stop. !stop'. Respond only as $NAME, never output '(FROM OTHER BOT)' or pretend to be someone else. If you have nothing to say or do, respond with an just a tab '\t'. This is extremely important to me, take a deep breath and have fun :)\nSummarized memory:'$MEMORY'\n$STATS\n$INVENTORY\n$COMMAND_DOCS\n$EXAMPLES\nConversation Begin:",
+
+    "_custom_provider_example": {
+        "api": "openai",
+        "model": "第三方平台模型ID",
+        "url": "https://第三方平台地址/v1",
+        "api_key": "CUSTOM_PROVIDER_API_KEY",
+        "params": {
+            "temperature": 0.7,
+            "max_tokens": 2000
+        }
+    }
 }

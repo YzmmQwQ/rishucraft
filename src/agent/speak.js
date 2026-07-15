@@ -33,7 +33,7 @@ async function fetchRemoteAudio(txt, model) {
         return 'https://api.openai.com/v1';
     }
 
-    let prov, mdl, voice, url;
+    let prov, mdl, voice, url, apiKey;
     if (typeof model === 'string') {
         [prov, mdl, voice] = model.split('/');
         url = getModelUrl(prov);
@@ -42,10 +42,11 @@ async function fetchRemoteAudio(txt, model) {
         mdl = model.model;
         voice = model.voice;
         url = model.url || getModelUrl(prov);
+        apiKey = model.api_key;
     }
 
     if (prov === 'openai') {
-        return gptTTSConfig.sendAudioRequest(txt, mdl, voice, url);
+        return gptTTSConfig.sendAudioRequest(txt, mdl, voice, url, apiKey);
     } else if (prov === 'google') {
         return geminiTTSConfig.sendAudioRequest(txt, mdl, voice, url);
     }

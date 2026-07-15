@@ -1,6 +1,13 @@
 {
     "OPENAI_API_KEY": "",
     "OPENAI_ORG_ID": "",
+    "CUSTOM_PROVIDER_API_KEY": "",
+    "CUSTOM_CHAT_API_KEY": "",
+    "CUSTOM_PLAN_API_KEY": "",
+    "CUSTOM_CODE_API_KEY": "",
+    "CUSTOM_VISION_API_KEY": "",
+    "CUSTOM_EMBEDDING_API_KEY": "",
+    "CUSTOM_TTS_API_KEY": "",
     "GEMINI_API_KEY": "",
     "ANTHROPIC_API_KEY": "",
     "REPLICATE_API_KEY": "",

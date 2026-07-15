@@ -201,18 +201,20 @@ docker-compose up --build
 
 聊天和规划模型分别通过 `chat_model` 与 `plan_model` 指定。模型可以是简单字符串，例如 `"gpt-5.4"`，也可以使用更明确的 `"{api}/{model}"` 格式，例如 `"openrouter/google/gemini-2.5-pro"`。旧版 `model` 字段仍作为两者的兼容回退。
 
-模型字段可以是字符串或对象。模型对象必须指定 `api`，还可选填 `model`、`url` 和额外的 `params`。你可以为对话、规划、代码编写、视觉、嵌入和语音合成分别使用不同模型或提供商。示例如下：
+模型字段可以是字符串或对象。模型对象必须指定 `api`，还可选填 `model`、`url`、`api_key` 和额外的 `params`。`api_key` 填写的是 `keys.json` 中的字段名称，不是真实密钥。你可以为对话、规划、代码编写、视觉、嵌入和语音合成分别使用不同模型、URL 和 Key。示例如下：
 
 ```json
 "chat_model": {
   "api": "openai",
   "model": "gpt-5.4-mini",
-  "url": "https://api.openai.com/v1/"
+  "url": "https://chat-provider.example/v1/",
+  "api_key": "CUSTOM_CHAT_API_KEY"
 },
 "plan_model": {
   "api": "openai",
   "model": "gpt-5.4",
-  "url": "https://api.openai.com/v1/",
+  "url": "https://plan-provider.example/v1/",
+  "api_key": "CUSTOM_PLAN_API_KEY",
   "params": {
     "max_tokens": 1000,
     "temperature": 1
@@ -233,7 +235,13 @@ docker-compose up --build
   "url": "https://api.openai.com/v1/",
   "model": "text-embedding-3-small"
 },
-"speak_model": "openai/tts-1/echo"
+"speak_model": {
+  "api": "openai",
+  "model": "tts-1",
+  "voice": "echo",
+  "url": "https://tts-provider.example/v1/",
+  "api_key": "CUSTOM_TTS_API_KEY"
+}
 ```
 
 `chat_model` 只用于生成日常对话回复；`plan_model` 用于记忆总结、目标规划和是否回应等非对话推理。`code_model` 用于 `newAction` 代码编写，`vision_model` 用于图像理解，`embedding` 用于对文本进行嵌入以选择示例，`speak_model` 用于语音合成。未配置 `code_model` 或 `vision_model` 时会回退到 `plan_model`。旧 `model` 会同时作为 `chat_model` 和 `plan_model` 的回退。
@@ -258,7 +266,7 @@ Profile 使用严格 JSON 格式，不能加入 `//` 或 `/* */` 注释。需要
 
 ## 语音合成模型
 
-语音合成模型用于朗读机器人回复，通过 `speak_model` 指定。该字段的解析方式与其他模型不同，只支持 `"{api}/{model}/{voice}"` 格式的字符串，例如 `"openai/tts-1/echo"`。语音合成目前仅支持 `openai` 和 `google`。
+语音合成模型用于朗读机器人回复，通过 `speak_model` 指定。它既支持 `"{api}/{model}/{voice}"` 字符串，例如 `"openai/tts-1/echo"`，也支持包含 `api`、`model`、`voice`、`url` 和 `api_key` 的对象。语音合成目前仅支持 `openai` 和 `google`；自定义 `api_key` 引用适用于 OpenAI 兼容语音接口。
 
 ## 通过命令行指定 Profile
 

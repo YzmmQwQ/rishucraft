@@ -4,7 +4,7 @@ import { strictFormat } from '../utils/text.js';
 
 export class GPT {
     static prefix = 'openai';
-    constructor(model_name, url, params) {
+    constructor(model_name, url, params, api_key) {
         this.model_name = model_name;
         this.params = params;
         this.url = url; // store so that we know whether a custom URL has been set
@@ -16,7 +16,8 @@ export class GPT {
         if (hasKey('OPENAI_ORG_ID'))
             config.organization = getKey('OPENAI_ORG_ID');
 
-        config.apiKey = getKey('OPENAI_API_KEY');
+        this.apiKeyName = api_key || 'OPENAI_API_KEY';
+        config.apiKey = getKey(this.apiKeyName);
 
         this.openai = new OpenAIApi(config);
     }
@@ -116,7 +117,7 @@ export class GPT {
 
 }
 
-const sendAudioRequest = async (text, model, voice, url) => {
+const sendAudioRequest = async (text, model, voice, url, api_key) => {
     const payload = {
         model: model,
         voice: voice,
@@ -131,7 +132,7 @@ const sendAudioRequest = async (text, model, voice, url) => {
     if (hasKey('OPENAI_ORG_ID'))
         config.organization = getKey('OPENAI_ORG_ID');
 
-    config.apiKey = getKey('OPENAI_API_KEY');
+    config.apiKey = getKey(api_key || 'OPENAI_API_KEY');
 
     const openai = new OpenAIApi(config);
 
