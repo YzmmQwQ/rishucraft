@@ -54,6 +54,7 @@ export const WOOL_COLORS = [
 
 
 export function initBot(username) {
+    let authSessionServer = null;
     const options = {
         username: username,
         host: settings.host,
@@ -67,12 +68,14 @@ export function initBot(username) {
         options.auth = createYggdrasilAuth(yggdrasil);
         options.sessionServer = yggdrasil.sessionServer;
         options.haveCredentials = true;
+        authSessionServer = yggdrasil.sessionServer;
     }
     if (!mc_version || mc_version === "auto") {
         delete options.version;
     }
 
     const bot = createBot(options);
+    bot.authSessionServer = authSessionServer;
 
     // Throttle position packets to avoid kicks on Paper/Spigot servers
     // Paper enforces stricter packet rate limits than vanilla, causing ECONNRESET

@@ -2,6 +2,7 @@ import { io } from 'socket.io-client';
 import convoManager from './conversation.js';
 import { setSettings } from './settings.js';
 import { getFullState } from './library/full_state.js';
+import { addBrowserViewer } from './vision/browser_viewer.js';
 
 // agent's individual connection to the mindserver
 // always connect to localhost
@@ -82,6 +83,20 @@ class MindServerProxy {
             }
         });
 
+        this.socket.on('start-viewer', async (callback = () => {}) => {
+            if (!this.agent?.bot) {
+                callback({ success: false, error: 'Agent is not in game.' });
+                return;
+            }
+            try {
+                await addBrowserViewer(this.agent.bot, this.agent.count_id, true);
+                callback({ success: true, port: 3000 + this.agent.count_id });
+            } catch (error) {
+                console.error('Error starting agent viewer:', error);
+                callback({ success: false, error: error.message || String(error) });
+            }
+        });
+
         this.socket.on('get-full-state', (callback) => {
             try {
                 const state = getFullState(this.agent);
@@ -122,8 +137,8 @@ class MindServerProxy {
         return this.agents.length - 1;
     }
 
-    login() {
-        this.socket.emit('login-agent', this.agent.name);
+    login(identity = {}) {
+        this.socket.emit('login-agent', this.agent.name, identity);
     }
 
     shutdown() {

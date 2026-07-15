@@ -475,11 +475,20 @@
         const agentLastMessage = {};
         const agentSkinUrls = {};
         const inventoryOpen = {};
+        const viewerOpen = {};
+        const messageDrafts = {};
         let currentAgents = [];
         let uiLanguage = RishuI18n.getInitialLanguage();
 
         function t(key, values) {
             return RishuI18n.translate(uiLanguage, key, values);
+        }
+
+        function escapeHTML(value) {
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;');
         }
 
         function translateSettingsForms() {
@@ -553,21 +562,19 @@
             agentSkinUrls[name] = safeUrl;
             const agentEl = document.getElementById(`agent-${name}`);
             const avatar = agentEl?.querySelector('.agent-avatar');
-            const base = avatar?.querySelector('.avatar-skin-base');
-            const overlay = avatar?.querySelector('.avatar-skin-overlay');
-            if (!avatar || !base || !overlay) return;
+            const head = avatar?.querySelector('.avatar-head');
+            if (!avatar || !head) return;
 
-            base.onload = () => avatar.classList.add('has-skin');
-            base.onerror = () => avatar.classList.remove('has-skin');
-            overlay.onerror = () => overlay.classList.add('is-missing');
-            overlay.onload = () => overlay.classList.remove('is-missing');
-            if (base.src !== safeUrl) base.src = safeUrl;
-            if (overlay.src !== safeUrl) overlay.src = safeUrl;
-            if (base.complete && base.naturalWidth) avatar.classList.add('has-skin');
+            head.onload = () => avatar.classList.add('has-skin');
+            head.onerror = () => avatar.classList.remove('has-skin');
+            if (head.src !== safeUrl) head.src = safeUrl;
+            if (head.complete && head.naturalWidth) avatar.classList.add('has-skin');
         }
 
         function restoreAgentAvatar(name) {
-            if (agentSkinUrls[name]) updateAgentAvatar(name, agentSkinUrls[name]);
+            const agent = currentAgents.find(item => item.name === name);
+            const sourceState = agent?.in_game ? 'authenticated' : 'profile';
+            updateAgentAvatar(name, `/assets/skin/${encodeURIComponent(name)}.png?source=${sourceState}`);
         }
 
         // Item texture helpers (use PrismarineJS minecraft-assets CDN with graceful fallbacks)
@@ -792,7 +799,6 @@
                 const healthEl = document.getElementById(`health-${name}`);
                 if (st && !st.error) {
                     const gp = st.gameplay || {};
-                    if (st.identity?.skinUrl) updateAgentAvatar(name, st.identity.skinUrl);
                     if (healthEl && typeof gp.health === 'number') {
                         const hMax = typeof gp.healthMax === 'number' ? gp.healthMax : 20;
                         healthEl.textContent = t('health', { value: gp.health, max: hMax });
@@ -996,14 +1002,61 @@
             const agentEl = document.getElementById(`agent-${name}`);
             if (!agentEl) return;
 
-            const settings = agentSettings[name];
-            const viewerContainer = agentEl.querySelector('.agent-view-container');
-            if (!viewerContainer) return;
-
             const agentState = currentAgents.find(a => a.name === name);
-            const shouldShow = agentState?.in_game && settings?.render_bot_view === true;
-            viewerContainer.parentElement.style.display = shouldShow ? '' : 'none';
+            if (!agentState) return;
+            const settings = agentSettings[name] || {};
+            const shouldShow = agentState.in_game && (viewerOpen[name] ?? settings.render_bot_view === true);
+            const viewerPanel = agentEl.querySelector('.viewer-panel');
+            if (shouldShow !== Boolean(viewerPanel)) rerenderAgentCard(name);
         }
+
+        function getViewerUrl(port) {
+            return `${window.location.protocol}//${window.location.hostname}:${Number(port)}/`;
+        }
+
+        function rerenderAgentCard(name) {
+            const agent = currentAgents.find(item => item.name === name);
+            const element = document.getElementById(`agent-${name}`);
+            if (!agent || !element) return;
+            element.outerHTML = renderAgentCard(agent);
+            restoreAgentAvatar(name);
+            resizeMessageInput(document.getElementById(`messageInput-${name}`));
+        }
+
+        function toggleAgentViewer(name) {
+            const agent = currentAgents.find(item => item.name === name);
+            if (!agent?.in_game) return;
+            const settings = agentSettings[name] || {};
+            const isOpen = viewerOpen[name] ?? settings.render_bot_view === true;
+            if (isOpen) {
+                viewerOpen[name] = false;
+                rerenderAgentCard(name);
+                return;
+            }
+
+            const button = document.getElementById(`viewerBtn-${name}`);
+            if (button) {
+                button.disabled = true;
+                button.textContent = t('startingViewer');
+            }
+            socket.timeout(11000).emit('start-agent-viewer', name, (error, response) => {
+                if (!error && response?.success) {
+                    if (Number.isFinite(Number(response.port))) agent.viewerPort = Number(response.port);
+                    viewerOpen[name] = true;
+                    rerenderAgentCard(name);
+                    return;
+                }
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = t('viewerFailed');
+                    button.title = response?.error || error?.message || t('viewerFailed');
+                    setTimeout(() => {
+                        button.textContent = t('showViewer');
+                    }, 1800);
+                }
+            });
+        }
+        window.toggleAgentViewer = toggleAgentViewer;
 
         discardBtn.addEventListener('click', () => {
             if (!currentAgentName || !originalAgentSettings) return;
@@ -1036,9 +1089,19 @@
 
         function renderAgentCard(agent) {
             const cfg = agentSettings[agent.name] || {};
-            const showViewer = agent.in_game && cfg.render_bot_view === true;
+            const showViewer = agent.in_game && (viewerOpen[agent.name] ?? cfg.render_bot_view === true);
             const viewerPort = agent.viewerPort;
-            const viewerHTML = showViewer ? `<div class="agent-view-container"><iframe class="agent-viewer" id="viewer-${agent.name}" src="http://localhost:${viewerPort}"></iframe></div>` : '';
+            const viewerUrl = getViewerUrl(viewerPort);
+            const viewerHTML = showViewer ? `
+                <div class="cell viewer-panel">
+                    <div class="viewer-panel-header">
+                        <strong>${t('viewerTitle', { name: agent.name })}</strong>
+                        <a href="${viewerUrl}" target="_blank" rel="noopener noreferrer">${t('openViewerWindow')}</a>
+                    </div>
+                    <div class="agent-view-container">
+                        <iframe class="agent-viewer" id="viewer-${agent.name}" src="${viewerUrl}" title="${t('viewerTitle', { name: agent.name })}" allowfullscreen></iframe>
+                    </div>
+                </div>` : '';
             const lastMessage = agentLastMessage[agent.name] || '';
             const invOpen = inventoryOpen[agent.name] === true;
             const invStyle = invOpen ? '' : 'display:none;';
@@ -1051,10 +1114,7 @@
                                 <div class="agent-identity">
                                     <div class="agent-avatar" aria-hidden="true">
                                         <span class="avatar-fallback">${avatarLabel}</span>
-                                        <span class="avatar-skin">
-                                            <img class="avatar-skin-layer avatar-skin-base" alt="">
-                                            <img class="avatar-skin-layer avatar-skin-overlay" alt="">
-                                        </span>
+                                        <img class="avatar-head" alt="">
                                     </div>
                                     <div>
                                         <div class="agent-name-row">${agent.name}</div>
@@ -1068,9 +1128,10 @@
                                 <div class="agent-card-tools">
                                     <button class="gear-btn" title="${t('settings')}" onclick="openAgentSettings('${agent.name}')">${t('settings')}</button>
                                     <button class="gear-btn" title="${t('inventory')}" onclick="toggleDetails('${agent.name}')">${t('inventory')}</button>
+                                    <button class="gear-btn" id="viewerBtn-${agent.name}" title="${showViewer ? t('hideViewer') : t('showViewer')}" onclick="toggleAgentViewer('${agent.name}')" ${!agent.in_game ? 'disabled' : ''}>${showViewer ? t('hideViewer') : t('showViewer')}</button>
                                 </div>
                             </div>
-                            ${showViewer ? `<div class="cell viewer-panel" style="grid-column: span 2; grid-row: span 2;">${viewerHTML}</div>` : ''}
+                            ${viewerHTML}
                             <div class="cell metric metric-action" id="action-${agent.name}">${t('idle')}</div>
                             <div class="cell metric metric-mode" id="mode-${agent.name}">-</div>
                             <div class="cell metric metric-health" id="health-${agent.name}">-</div>
@@ -1088,11 +1149,11 @@
                         </div>
                         <div class="controls-row">
                             <div class="message-composer">
-                                <input class="msg-input" type="text" id="messageInput-${agent.name}" placeholder="${t('messagePlaceholder', { name: agent.name })}"
+                                <textarea class="msg-input" id="messageInput-${agent.name}" rows="1" maxlength="2000" placeholder="${t('messagePlaceholder', { name: agent.name })}"
                                     oninput="onMsgInputChange('${agent.name}')"
-                                    onkeydown="if(event.key === 'Enter') document.getElementById('sendBtn-${agent.name}').click()"
-                                    ${!agent.in_game ? 'disabled' : ''}>
-                                <button class="start-btn" id="sendBtn-${agent.name}" disabled onclick="sendMessage('${agent.name}', document.getElementById('messageInput-${agent.name}').value)">${t('send')}</button>
+                                    onkeydown="handleMessageKeydown(event, '${agent.name}')"
+                                    ${!agent.in_game ? 'disabled' : ''}>${escapeHTML(messageDrafts[agent.name] || '')}</textarea>
+                                <button class="start-btn" id="sendBtn-${agent.name}" disabled onclick="sendMessage('${agent.name}', document.getElementById('messageInput-${agent.name}').value, true)">${t('send')}</button>
                             </div>
                             <div class="action-cluster">
                                 <button class="neutral-btn" onclick="sendMessage('${agent.name}', '!stop')" ${!agent.in_game ? 'disabled' : ''}>${t('stopAction')}</button>
@@ -1153,6 +1214,8 @@
                 if (!agents.find(a => a.name === name)) {
                     el.remove();
                     delete inventoryOpen[name];
+                    delete viewerOpen[name];
+                    delete messageDrafts[name];
                 }
             });
         }
@@ -1225,6 +1288,8 @@
                     el.remove();
                     delete inventoryOpen[name];
                     delete agentSkinUrls[name];
+                    delete viewerOpen[name];
+                    delete messageDrafts[name];
                 }
             });
         });
@@ -1259,10 +1324,10 @@
                 socket.emit('shutdown');
             }
         }
-        function sendMessage(n, m) {
+        function sendMessage(n, m, fromComposer = false) {
             if (!m || !m.trim()) return;
             const input = document.getElementById(`messageInput-${n}`);
-            const btn = document.getElementById(`sendBtn-${n}`);
+            const btn = fromComposer ? document.getElementById(`sendBtn-${n}`) : null;
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = t('sending');
@@ -1272,7 +1337,11 @@
             socket.timeout(6000).emit('send-message', n, { message: m.trim() }, (error, response) => {
                 const success = !error && response?.success === true;
                 if (success) {
-                    if (input) input.value = '';
+                    if (fromComposer && input) {
+                        input.value = '';
+                        delete messageDrafts[n];
+                        resizeMessageInput(input);
+                    }
                     if (btn) btn.textContent = t('sent');
                 } else if (btn) {
                     btn.textContent = t('sendFailed');
@@ -1290,8 +1359,23 @@
             const input = document.getElementById(`messageInput-${name}`);
             const btn = document.getElementById(`sendBtn-${name}`);
             if (btn && input) {
+                messageDrafts[name] = input.value;
+                resizeMessageInput(input);
                 btn.disabled = !(input.value && input.value.trim().length > 0);
             }
+        }
+
+        function resizeMessageInput(input) {
+            if (!input) return;
+            input.style.height = '40px';
+            input.style.height = `${Math.min(input.scrollHeight, 104)}px`;
+        }
+
+        function handleMessageKeydown(event, name) {
+            if (event.key !== 'Enter' || event.shiftKey) return;
+            event.preventDefault();
+            const button = document.getElementById(`sendBtn-${name}`);
+            if (button && !button.disabled) button.click();
         }
 
         document.getElementById('uiLanguageSelect').addEventListener('change', event => {

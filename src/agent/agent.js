@@ -93,7 +93,12 @@ export class Agent {
 
         this.bot.on('login', () => {
             console.log(this.name, 'logged in!');
-            serverProxy.login();
+            const authenticatedProfile = this.bot._client?.session?.selectedProfile;
+            serverProxy.login({
+                username: authenticatedProfile?.name || this.bot.username,
+                uuid: settings.auth === 'offline' ? null : (authenticatedProfile?.id || this.bot._client?.uuid || null),
+                sessionServer: this.bot.authSessionServer || null
+            });
             
             // Set skin for profile, requires Fabric Tailor. (https://modrinth.com/mod/fabrictailor)
             if (this.prompter.profile.skin)

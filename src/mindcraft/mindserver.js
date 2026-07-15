@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as mindcraft from './mindcraft.js';
 import { readFileSync } from 'fs';
+import { renderSkinHead, resolveSkinTexture } from '../utils/skin_resolver.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Mindserver is:
@@ -16,6 +17,7 @@ let io;
 let server;
 const agent_connections = {};
 const agent_listeners = [];
+const skin_cache = new Map();
 
 const settings_spec = JSON.parse(readFileSync(path.join(__dirname, 'public/settings_spec.json'), 'utf8'));
 
@@ -25,6 +27,7 @@ class AgentConnection {
         this.settings = settings;
         this.in_game = false;
         this.full_state = null;
+        this.auth_identity = null;
         this.viewer_port = viewer_port;
     }
     setSettings(settings) {
@@ -35,6 +38,7 @@ class AgentConnection {
 export function registerAgent(settings, viewer_port) {
     let agentConnection = new AgentConnection(settings, viewer_port);
     agent_connections[settings.profile.name] = agentConnection;
+    skin_cache.delete(settings.profile.name);
 }
 
 export function logoutAgent(agentName) {
@@ -53,6 +57,48 @@ export function createMindServer(host_public = false, port = 8080) {
     // Serve static files
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     app.use(express.static(path.join(__dirname, 'public')));
+
+    app.get('/assets/skin/:agent.png', async (req, res) => {
+        const agentName = String(req.params.agent || '');
+        const conn = agent_connections[agentName];
+        if (!conn) return res.status(404).end();
+
+        const identity = conn.auth_identity || {};
+        const auth = String(conn.settings?.auth || 'offline').toLowerCase();
+        let sessionServer = identity.sessionServer || null;
+        if (!sessionServer && auth === 'yggdrasil' && conn.settings?.yggdrasil_server) {
+            sessionServer = `${String(conn.settings.yggdrasil_server).replace(/\/+$/, '')}/sessionserver`;
+        }
+        const cacheKey = JSON.stringify({
+            auth,
+            username: identity.username || conn.settings?.profile?.name || agentName,
+            uuid: identity.uuid || null,
+            sessionServer
+        });
+        const cached = skin_cache.get(agentName);
+        if (cached?.key === cacheKey && cached.expiresAt > Date.now()) {
+            res.setHeader('Cache-Control', 'private, max-age=300');
+            res.type('png');
+            return res.end(cached.image);
+        }
+
+        try {
+            const skinUrl = await resolveSkinTexture({
+                auth,
+                username: identity.username || conn.settings?.profile?.name || agentName,
+                uuid: identity.uuid || null,
+                sessionServer
+            });
+            const image = await renderSkinHead(skinUrl);
+            skin_cache.set(agentName, { key: cacheKey, image, expiresAt: Date.now() + 10 * 60 * 1000 });
+            res.setHeader('Cache-Control', 'private, max-age=300');
+            res.type('png');
+            return res.end(image);
+        } catch (error) {
+            console.warn(`Could not resolve skin for ${agentName}: ${error.message}`);
+            return res.status(404).end();
+        }
+    });
 
     // Texture proxy: resolve item/block textures using minecraft-assets with version fallback
     app.get('/assets/item/:agent/:name.png', async (req, res) => {
@@ -177,15 +223,26 @@ export function createMindServer(host_public = false, port = 8080) {
             }
         });
 
-        socket.on('login-agent', (agentName) => {
+        socket.on('login-agent', (agentName, identity = {}, callback = () => {}) => {
             if (agent_connections[agentName]) {
                 agent_connections[agentName].socket = socket;
                 agent_connections[agentName].in_game = true;
+                const sessionServer = typeof identity.sessionServer === 'string' && /^https?:\/\//i.test(identity.sessionServer)
+                    ? identity.sessionServer.replace(/\/+$/, '')
+                    : null;
+                agent_connections[agentName].auth_identity = {
+                    username: typeof identity.username === 'string' && identity.username.trim() ? identity.username.trim() : agentName,
+                    uuid: typeof identity.uuid === 'string' ? identity.uuid : null,
+                    sessionServer
+                };
+                skin_cache.delete(agentName);
                 curAgentName = agentName;
                 agentsStatusUpdate();
+                callback({ success: true });
             }
             else {
                 console.warn(`Unregistered agent ${agentName} tried to login`);
+                callback({ success: false, error: `Agent ${agentName} is not registered.` });
             }
         });
 
@@ -284,6 +341,25 @@ export function createMindServer(host_public = false, port = 8080) {
                 });
             } catch (error) {
                 console.error('Error forwarding WebUI message:', error);
+                callback({ success: false, error: error.message || String(error) });
+            }
+        });
+
+        socket.on('start-agent-viewer', (agentName, callback = () => {}) => {
+            const agent = agent_connections[agentName];
+            if (!agent || !agent.in_game || !agent.socket) {
+                callback({ success: false, error: `Agent ${agentName} is not ready to start a viewer.` });
+                return;
+            }
+            try {
+                agent.socket.timeout(10000).emit('start-viewer', (error, response) => {
+                    if (error) {
+                        callback({ success: false, error: `Agent ${agentName} did not start the viewer in time.` });
+                        return;
+                    }
+                    callback(response || { success: true, port: agent.viewer_port });
+                });
+            } catch (error) {
                 callback({ success: false, error: error.message || String(error) });
             }
         });

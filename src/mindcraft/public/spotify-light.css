@@ -79,6 +79,7 @@ body {
 
 button,
 input,
+textarea,
 select {
     font: inherit;
 }
@@ -103,6 +104,7 @@ button:not(:disabled):active {
 
 button:focus-visible,
 input:focus-visible,
+textarea:focus-visible,
 select:focus-visible {
     outline: 3px solid rgba(30, 215, 96, 0.28) !important;
     outline-offset: 2px;
@@ -318,10 +320,9 @@ select:focus-visible {
     width: 46px;
     height: 46px;
     flex: 0 0 auto;
-    overflow: hidden;
     place-items: center;
-    border: 1px solid rgba(18, 18, 18, 0.1);
-    border-radius: 12px;
+    border: 0;
+    border-radius: 0;
     background: var(--mc-ink);
     color: var(--mc-green);
     font-size: 18px;
@@ -334,38 +335,20 @@ select:focus-visible {
     z-index: 0;
 }
 
-.avatar-skin {
+.avatar-head {
     position: absolute;
     z-index: 1;
     inset: 0;
     display: none;
-    overflow: hidden;
-    background: #d9d9d9;
-}
-
-.agent-avatar.has-skin .avatar-skin { display: block; }
-
-.avatar-skin-layer {
-    position: absolute;
-    width: 800%;
-    height: 800%;
-    max-width: none;
+    width: 100%;
+    height: 100%;
+    background: transparent;
     image-rendering: pixelated;
     pointer-events: none;
     user-select: none;
 }
 
-.avatar-skin-base {
-    top: -100%;
-    left: -100%;
-}
-
-.avatar-skin-overlay {
-    top: -100%;
-    left: -500%;
-}
-
-.avatar-skin-overlay.is-missing { display: none; }
+.agent-avatar.has-skin .avatar-head { display: block; }
 
 .agent-name-row {
     gap: 8px;
@@ -452,6 +435,8 @@ select:focus-visible {
 .metric-equipped::before { content: "Main hand"; }
 
 .viewer-panel {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
     min-height: 220px !important;
     padding: 0 !important;
     overflow: hidden;
@@ -459,9 +444,40 @@ select:focus-visible {
     background: #171717 !important;
 }
 
+.viewer-panel-header {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 16px;
+    background: #171717;
+    color: #fff;
+    font-size: 12px;
+}
+
+.viewer-panel-header a {
+    color: var(--mc-green);
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.viewer-panel-header a:hover { text-decoration: underline; }
+
 .agent-view-container {
+    width: 100%;
+    height: auto !important;
+    aspect-ratio: 16 / 9 !important;
     margin: 0 !important;
-    border-radius: inherit;
+    border-radius: 0 !important;
+    background: #171717;
+}
+
+.agent-viewer {
+    width: 100%;
+    height: 100%;
+    border: 0;
     background: #171717;
 }
 
@@ -552,16 +568,16 @@ select:focus-visible {
 
 .message-composer {
     display: flex;
-    height: 52px;
-    max-height: 52px;
+    min-height: 52px;
+    max-height: 116px;
     min-width: min(100%, 420px);
     flex: 1 1 500px;
     overflow: hidden;
-    align-items: center;
+    align-items: flex-end;
     gap: 8px;
     padding: 5px 5px 5px 16px;
     border: 1px solid var(--mc-border);
-    border-radius: var(--mc-pill);
+    border-radius: 20px;
     background: var(--mc-surface-soft);
     transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
@@ -576,7 +592,7 @@ select:focus-visible {
     width: 100% !important;
     height: 40px !important;
     min-height: 40px !important;
-    max-height: 40px !important;
+    max-height: 104px !important;
     min-width: 80px;
     padding: 8px 0 !important;
     border: 0 !important;
@@ -584,7 +600,9 @@ select:focus-visible {
     background: transparent !important;
     color: var(--mc-ink) !important;
     line-height: 20px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    resize: none;
 }
 
 .msg-input::placeholder { color: var(--mc-faint); }
@@ -879,7 +897,7 @@ button:disabled,
     .agent-card-tools {
         display: grid;
         width: 100%;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .agent-card-tools button {
