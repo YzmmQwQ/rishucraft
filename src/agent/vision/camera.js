@@ -23,9 +23,9 @@ export class Camera extends EventEmitter {
         this.canvas = createCanvas(this.width, this.height);
         this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
         this.viewer = new Viewer(this.renderer);
-        this._init().then(() => {
+        this.ready = this._init().then(() => {
             this.emit('ready');
-        })
+        });
     }
   
     async _init () {
@@ -41,6 +41,7 @@ export class Camera extends EventEmitter {
     }
   
     async capture() {
+        await this.ready;
         const center = new Vec3(this.bot.entity.position.x, this.bot.entity.position.y+this.bot.entity.height, this.bot.entity.position.z);
         this.viewer.camera.position.set(center.x, center.y, center.z);
         await this.worldView.updatePosition(center);

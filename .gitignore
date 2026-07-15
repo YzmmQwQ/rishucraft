@@ -1,6 +1,7 @@
 .vscode/
 .idea/
 node_modules/
+.npm-cache/
 package-lock.json
 code_records/
 scratch.js

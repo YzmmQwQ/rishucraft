@@ -21,7 +21,7 @@ RishuCraft 是 [Mindcraft](https://github.com/mindcraft-bots/mindcraft) 的衍�
 ## 环境要求
 
 - [Minecraft Java 版](https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc)（最高支持 v1.21.11，推荐 v1.21.6）
-- [Node.js](https://nodejs.org/)（最低 v22.13.0，推荐使用 Node v22 LTS）
+- [Node.js](https://nodejs.org/)（最低 v22.13.0，支持并推荐 Node v24）
 - 至少一个受支持 API 提供商的 API Key。请参阅[支持的 API](#模型定制)。默认使用 OpenAI。
 
 > [!IMPORTANT]
@@ -38,6 +38,8 @@ RishuCraft 是 [Mindcraft](https://github.com/mindcraft-bots/mindcraft) 的衍�
 3. 将 `keys.example.json` 重命名为 `keys.json`，然后填入 API Key（只需配置一个）。目标模型在 `andy.json` 或其他 Profile 中设置；其他模型请参考下方表格。
 
 4. 在项目目录中打开终端或命令提示符，运行 `npm install`。
+
+   默认关闭的 AI 视觉功能包含需要本地编译的原生 WebGL 依赖，因此不再阻塞普通安装。如需启用 `allow_vision`，请先安装系统 C++ 构建工具，再运行 `npm run install:vision`。
 
 5. 启动一个 Minecraft 世界，并通过局域网开放到本机端口 `55916`。
 
