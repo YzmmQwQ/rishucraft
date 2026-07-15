@@ -11,6 +11,7 @@ import convoManager from '../conversation.js';
 
 export function getFullState(agent) {
     const bot = agent.bot;
+    const ownPlayer = bot.players?.[bot.username] || bot.players?.[agent.name];
 
     const pos = getPosition(bot);
     const position = {
@@ -60,6 +61,9 @@ export function getFullState(agent) {
 
     const state = {
         name: agent.name,
+        identity: {
+            skinUrl: ownPlayer?.skinData?.url || null
+        },
         gameplay: {
             position,
             dimension: bot.game.dimension,

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>Mindcraft</title>
+    <title>RishuCRAFT NEXT</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/i18n.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -370,24 +371,50 @@
         }
         .footer-left { color: #cccccc; font-style: italic; }
     </style>
+    <link rel="stylesheet" href="/spotify-light.css">
 </head>
 <body>
     <div class="title-row">
         <div class="title-left">
-            <h1 style="margin: 0;">Mindcraft</h1>
-            <span id="msStatus" class="status-badge offline">mindserver offline</span>
+            <div class="brand-mark">
+                <img src="/mindcraft-icon.png" alt="RishuCRAFT NEXT">
+            </div>
+            <div class="brand-copy">
+                <span class="brand-eyebrow" data-i18n="agentConsole">智能体控制台</span>
+                <h1>RishuCRAFT NEXT</h1>
+            </div>
         </div>
         <div class="title-spacer"></div>
+        <div class="header-status">
+            <span id="msStatus" class="status-badge offline">MindServer 离线</span>
+        </div>
     </div>
-    <div id="agents"></div>
+
+    <main class="app-shell">
+        <div class="section-heading">
+            <div>
+                <span class="section-eyebrow" data-i18n="yourWorkspace">你的工作区</span>
+                <h2 data-i18n="agents">智能体</h2>
+            </div>
+            <p data-i18n="dashboardIntro">在一个页面中查看智能体状态、发送消息并管理所有 Minecraft 会话。</p>
+        </div>
+        <div id="agents"></div>
+    </main>
 
     <div class="page-footer">
-        <div>
-            <button id="openCreateAgentBtn" class="start-btn">New Agent</button>
+        <div class="footer-primary-actions">
+            <button id="openCreateAgentBtn" class="start-btn" data-i18n="newAgent">新建智能体</button>
+            <label class="language-picker" for="uiLanguageSelect">
+                <span data-i18n="interfaceLanguage">界面语言</span>
+                <select id="uiLanguageSelect" aria-label="界面语言">
+                    <option value="zh-CN">简体中文</option>
+                    <option value="en">English</option>
+                </select>
+            </label>
         </div>
-        <div style="display:flex; gap:12px;">
-            <button class="stop-btn" onclick="disconnectAllAgents()">Disconnect All Agents</button>
-            <button class="stop-btn" onclick="confirmShutdown()">Full Shutdown</button>
+        <div class="footer-actions">
+            <button class="stop-btn" onclick="disconnectAllAgents()" data-i18n="disconnectAll">断开全部智能体</button>
+            <button class="stop-btn" onclick="confirmShutdown()" data-i18n="fullShutdown">完全关闭</button>
         </div>
     </div>
 
@@ -395,22 +422,22 @@
     <div id="createAgentModal" class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
-                <h2 style="margin:0;">Create Agent</h2>
-                <button id="closeCreateAgentBtn" class="modal-close-btn">Close</button>
+                <h2 style="margin:0;" data-i18n="createAgent">创建智能体</h2>
+                <button id="closeCreateAgentBtn" class="modal-close-btn" data-i18n="close">关闭</button>
             </div>
             <div class="modal-body">
                 <div id="createAgentSection">
-                    <div id="profileStatus" style="margin:6px 0;">Profile: Not uploaded</div>
+                    <div id="profileStatus" style="margin:6px 0;" data-i18n="profileNotUploaded">角色配置：未上传</div>
                     <div id="settingsForm"></div>
                     <div id="createError" style="color:#f44336;margin-top:10px;"></div>
                     <input type="file" id="profileFileInput" accept=".json,application/json" style="display:none">
                 </div>
             </div>
             <div class="modal-footer">
-                <div class="footer-left" id="footerStatus">Configure settings, then upload a profile and create the agent.</div>
+                <div class="footer-left" id="footerStatus" data-i18n="createAgentHint">配置参数，然后上传角色配置并创建智能体。</div>
                 <div class="footer-actions">
-                    <button id="uploadProfileBtn" class="start-btn">Upload Profile</button>
-                    <button id="submitCreateAgentBtn" class="start-btn" disabled>Create Agent</button>
+                    <button id="uploadProfileBtn" class="start-btn" data-i18n="uploadProfile">上传角色配置</button>
+                    <button id="submitCreateAgentBtn" class="start-btn" disabled data-i18n="createAgent">创建智能体</button>
                 </div>
             </div>
         </div>
@@ -420,8 +447,8 @@
     <div id="agentSettingsModal" class="modal-backdrop">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="agentSettingsTitle" style="margin:0;">Agent Settings</h2>
-                <button id="closeAgentSettingsBtn" class="modal-close-btn">Close</button>
+                <h2 id="agentSettingsTitle" style="margin:0;" data-i18n="agentSettings">智能体设置</h2>
+                <button id="closeAgentSettingsBtn" class="modal-close-btn" data-i18n="close">关闭</button>
             </div>
             <div class="modal-body">
                 <div id="agentSettingsSection">
@@ -430,10 +457,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <div class="footer-left" id="agentSettingsFooter">Modify settings then apply to restart the agent.</div>
+                <div class="footer-left" id="agentSettingsFooter" data-i18n="agentSettingsHint">修改设置并应用，智能体随后将重新启动。</div>
                 <div class="footer-actions">
-                    <button id="discardAgentSettingsBtn" class="stop-btn" style="background:#777;">Discard Changes</button>
-                    <button id="applyAgentSettingsBtn" class="start-btn" disabled>Apply & Restart</button>
+                    <button id="discardAgentSettingsBtn" class="stop-btn" style="background:#777;" data-i18n="discardChanges">放弃更改</button>
+                    <button id="applyAgentSettingsBtn" class="start-btn" disabled data-i18n="applyRestart">应用并重启</button>
                 </div>
             </div>
         </div>
@@ -446,8 +473,102 @@
         let profileData = null;
         const agentSettings = {};
         const agentLastMessage = {};
+        const agentSkinUrls = {};
         const inventoryOpen = {};
         let currentAgents = [];
+        let uiLanguage = RishuI18n.getInitialLanguage();
+
+        function t(key, values) {
+            return RishuI18n.translate(uiLanguage, key, values);
+        }
+
+        function translateSettingsForms() {
+            document.querySelectorAll('[data-setting-key]').forEach(label => {
+                const key = label.dataset.settingKey;
+                const cfg = settingsSpec[key] || {};
+                const translated = RishuI18n.getSetting(uiLanguage, key, cfg.description || '');
+                label.textContent = translated.label;
+                label.title = `${key} — ${translated.description}`;
+                const input = label.parentElement?.querySelector('input');
+                if (input) input.title = translated.description;
+            });
+        }
+
+        function translateActionLabel(action) {
+            const key = {
+                idle: 'idle', acting: 'acting', chatting: 'chatting',
+                thinking: 'thinking', stopped: 'stopped'
+            }[String(action || '').toLowerCase()];
+            return key ? t(key) : action;
+        }
+
+        function applyTranslations() {
+            document.documentElement.lang = uiLanguage;
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                element.textContent = t(element.dataset.i18n);
+            });
+            const languageSelect = document.getElementById('uiLanguageSelect');
+            if (languageSelect) {
+                languageSelect.value = uiLanguage;
+                languageSelect.setAttribute('aria-label', t('interfaceLanguage'));
+            }
+            translateSettingsForms();
+            updateStatus(socket.connected);
+
+            const profileStatus = document.getElementById('profileStatus');
+            if (profileStatus) {
+                profileStatus.textContent = profileData
+                    ? t('profileUploaded', { name: profileData.name || t('uploadProfile') })
+                    : t('profileNotUploaded');
+            }
+            if (currentAgentName) agentSettingsTitle.textContent = t('settingsFor', { name: currentAgentName });
+
+            if (currentAgents.length) {
+                agentsDiv.innerHTML = currentAgents.map(agent => renderAgentCard(agent)).join('');
+                setTimeout(() => currentAgents.forEach(agent => {
+                    if (agent.in_game) updateAgentViewer(agent.name);
+                    restoreAgentAvatar(agent.name);
+                }), 0);
+            } else if (agentsDiv.querySelector('.empty-state')) {
+                agentsDiv.innerHTML = renderEmptyState();
+            }
+        }
+
+        function setUiLanguage(language) {
+            uiLanguage = RishuI18n.normalizeLanguage(language);
+            try { localStorage.setItem('rishucraft-ui-language', uiLanguage); } catch { /* ignore */ }
+            applyTranslations();
+        }
+
+        function updateAgentAvatar(name, skinUrl) {
+            let parsedUrl;
+            try {
+                parsedUrl = new URL(skinUrl, window.location.href);
+                if (!['http:', 'https:'].includes(parsedUrl.protocol)) return;
+            } catch {
+                return;
+            }
+
+            const safeUrl = parsedUrl.href;
+            agentSkinUrls[name] = safeUrl;
+            const agentEl = document.getElementById(`agent-${name}`);
+            const avatar = agentEl?.querySelector('.agent-avatar');
+            const base = avatar?.querySelector('.avatar-skin-base');
+            const overlay = avatar?.querySelector('.avatar-skin-overlay');
+            if (!avatar || !base || !overlay) return;
+
+            base.onload = () => avatar.classList.add('has-skin');
+            base.onerror = () => avatar.classList.remove('has-skin');
+            overlay.onerror = () => overlay.classList.add('is-missing');
+            overlay.onload = () => overlay.classList.remove('is-missing');
+            if (base.src !== safeUrl) base.src = safeUrl;
+            if (overlay.src !== safeUrl) overlay.src = safeUrl;
+            if (base.complete && base.naturalWidth) avatar.classList.add('has-skin');
+        }
+
+        function restoreAgentAvatar(name) {
+            if (agentSkinUrls[name]) updateAgentAvatar(name, agentSkinUrls[name]);
+        }
 
         // Item texture helpers (use PrismarineJS minecraft-assets CDN with graceful fallbacks)
         const BASE_ICON_VERSION_CANDIDATES = ['1.21.8'];
@@ -504,18 +625,18 @@
             `;
         }
         function emptySlotHTML(label) {
-            return `<div class="armor-slot empty" title="${label}: none"><span class="armor-placeholder">-</span></div>`;
+            return `<div class="armor-slot empty" title="${label}: ${t('none')}"><span class="armor-placeholder">-</span></div>`;
         }
 
         const statusEl = document.getElementById('msStatus');
         function updateStatus(connected) {
             if (!statusEl) return;
             if (connected) {
-                statusEl.textContent = 'MindServer online';
+                statusEl.textContent = t('mindServerOnline');
                 statusEl.classList.remove('offline');
                 statusEl.classList.add('online');
             } else {
-                statusEl.textContent = 'MindServer offline';
+                statusEl.textContent = t('mindServerOffline');
                 statusEl.classList.remove('online');
                 statusEl.classList.add('offline');
             }
@@ -528,6 +649,7 @@
         socket.on('connect', () => {
             updateStatus(true);
             subscribeToState();
+            socket.emit('get-agents-status');
             // Clear all cached settings on reconnect
             Object.keys(agentSettings).forEach(name => delete agentSettings[name]);
         });
@@ -558,8 +680,10 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = 'setting-wrapper';
                 const label = document.createElement('label');
-                label.textContent = key;
-                label.title = cfg.description || '';
+                const translated = RishuI18n.getSetting(uiLanguage, key, cfg.description || '');
+                label.textContent = translated.label;
+                label.title = `${key} — ${translated.description}`;
+                label.dataset.settingKey = key;
                 let input;
                 switch (cfg.type) {
                     case 'boolean':
@@ -577,7 +701,7 @@
                         input.type = 'text';
                         input.value = typeof cfg.default === 'object' ? JSON.stringify(cfg.default) : cfg.default;
                 }
-                input.title = cfg.description || '';
+                input.title = translated.description;
                 input.id = `setting-${key}`;
                 wrapper.appendChild(label);
                 wrapper.appendChild(input);
@@ -597,13 +721,13 @@
                 try {
                     profileData = JSON.parse(ev.target.result);
                     document.getElementById('submitCreateAgentBtn').disabled = false;
-                    document.getElementById('profileStatus').textContent = `Profile: ${profileData.name || 'Uploaded'}`;
+                    document.getElementById('profileStatus').textContent = t('profileUploaded', { name: profileData.name || t('uploadProfile') });
                     document.getElementById('createError').textContent = '';
                 } catch (err) {
-                    document.getElementById('createError').textContent = 'Invalid profile JSON: ' + err.message;
+                    document.getElementById('createError').textContent = t('invalidProfile', { error: err.message });
                     profileData = null;
                     document.getElementById('submitCreateAgentBtn').disabled = true;
-                    document.getElementById('profileStatus').textContent = 'Profile: Not uploaded';
+                    document.getElementById('profileStatus').textContent = t('profileNotUploaded');
                 }
             };
             reader.readAsText(file);
@@ -629,12 +753,12 @@
             });
             socket.emit('create-agent', settings, res => {
                 if (!res.success) {
-                    document.getElementById('createError').textContent = res.error || 'Unknown error';
+                    document.getElementById('createError').textContent = res.error || t('unknownError');
                 } else {
                     // reset on success
                     profileData = null;
                     document.getElementById('submitCreateAgentBtn').disabled = true;
-                    document.getElementById('profileStatus').textContent = 'Profile: Not uploaded';
+                    document.getElementById('profileStatus').textContent = t('profileNotUploaded');
                     document.getElementById('createError').textContent = '';
                     hideCreateAgentModal();
                 }
@@ -668,9 +792,10 @@
                 const healthEl = document.getElementById(`health-${name}`);
                 if (st && !st.error) {
                     const gp = st.gameplay || {};
+                    if (st.identity?.skinUrl) updateAgentAvatar(name, st.identity.skinUrl);
                     if (healthEl && typeof gp.health === 'number') {
                         const hMax = typeof gp.healthMax === 'number' ? gp.healthMax : 20;
-                        healthEl.textContent = `health: ${gp.health}/${hMax}`;
+                        healthEl.textContent = t('health', { value: gp.health, max: hMax });
                     }
                     const posEl = document.getElementById(`pos-${name}`);
                     const hunEl = document.getElementById(`hunger-${name}`);
@@ -686,34 +811,34 @@
                     }
                     if (hunEl && typeof gp.hunger === 'number') {
                         const fMax = typeof gp.hungerMax === 'number' ? gp.hungerMax : 20;
-                        hunEl.textContent = `hunger: ${gp.hunger}/${fMax}`;
+                        hunEl.textContent = t('hunger', { value: gp.hunger, max: fMax });
                     }
-                    if (bioEl && gp.biome) bioEl.textContent = `biome: ${gp.biome}`;
-                    if (modeEl && gp.gamemode) modeEl.textContent = `gamemode: ${gp.gamemode}`;
+                    if (bioEl && gp.biome) bioEl.textContent = t('biome', { value: gp.biome });
+                    if (modeEl && gp.gamemode) modeEl.textContent = t('gameMode', { value: gp.gamemode });
                     if (itemsEl && st.inventory) {
                         const used = st.inventory.stacksUsed ?? 0;
                         const total = st.inventory.totalSlots ?? 0;
-                        itemsEl.textContent = `inventory slots: ${used}/${total}`;
+                        itemsEl.textContent = t('inventorySlots', { used, total });
                     }
                     if (equippedEl && st.inventory?.equipment) {
                         const e = st.inventory.equipment;
-                        equippedEl.textContent = `equipped: ${e.mainHand || 'none'}`;
+                        equippedEl.textContent = t('equipped', { value: e.mainHand || t('none') });
                     }
                     const armorEl = document.getElementById(`armor-${name}`);
                     if (armorEl && st.inventory?.equipment) {
                         const e = st.inventory.equipment;
                         const parts = [];
-                        parts.push(e.helmet ? iconHTMLForItem(e.helmet, `head: ${prettyItemName(e.helmet)}`, name) : emptySlotHTML('head'));
-                        parts.push(e.chestplate ? iconHTMLForItem(e.chestplate, `chest: ${prettyItemName(e.chestplate)}`, name) : emptySlotHTML('chest'));
-                        parts.push(e.leggings ? iconHTMLForItem(e.leggings, `legs: ${prettyItemName(e.leggings)}`, name) : emptySlotHTML('legs'));
-                        parts.push(e.boots ? iconHTMLForItem(e.boots, `feet: ${prettyItemName(e.boots)}`, name) : emptySlotHTML('feet'));
+                        parts.push(e.helmet ? iconHTMLForItem(e.helmet, `${t('head')}: ${prettyItemName(e.helmet)}`, name) : emptySlotHTML(t('head')));
+                        parts.push(e.chestplate ? iconHTMLForItem(e.chestplate, `${t('chest')}: ${prettyItemName(e.chestplate)}`, name) : emptySlotHTML(t('chest')));
+                        parts.push(e.leggings ? iconHTMLForItem(e.leggings, `${t('legs')}: ${prettyItemName(e.leggings)}`, name) : emptySlotHTML(t('legs')));
+                        parts.push(e.boots ? iconHTMLForItem(e.boots, `${t('feet')}: ${prettyItemName(e.boots)}`, name) : emptySlotHTML(t('feet')));
                         // Main hand for quick glance
-                        parts.push(e.mainHand ? iconHTMLForItem(e.mainHand, `main hand: ${prettyItemName(e.mainHand)}`, name) : emptySlotHTML('main hand'));
+                        parts.push(e.mainHand ? iconHTMLForItem(e.mainHand, `${t('mainHand')}: ${prettyItemName(e.mainHand)}`, name) : emptySlotHTML(t('mainHand')));
                         armorEl.innerHTML = `<div class="armor-grid">${parts.join('')}</div>`;
                     }
                     if (actionEl && st.action) {
-                        actionEl.textContent = `${st.action.current || 'Idle'}`;
-                        const _statusColors = { acting: '#4CAF50', chatting: '#42a5f5', thinking: '#9e9e9e', stopped: '#f44336', idle: '#888' };
+                        actionEl.textContent = translateActionLabel(st.action.current || 'Idle');
+                        const _statusColors = { acting: '#12833b', chatting: '#2563eb', thinking: '#727272', stopped: '#d9364f', idle: '#727272' };
                         actionEl.style.color = _statusColors[st.action.kind] || '';
                     }
                     if (invGrid && st.inventory?.counts) {
@@ -739,7 +864,7 @@
                                 .join('');
                         } else {
                             invGrid.classList.add('empty');
-                            invGrid.innerHTML = '<div class="cell">(empty)</div>';
+                            invGrid.innerHTML = `<div class="cell">(${t('empty')})</div>`;
                         }
                     }
                 }
@@ -779,8 +904,10 @@
                 const wrapper = document.createElement('div');
                 wrapper.className = 'setting-wrapper';
                 const label = document.createElement('label');
-                label.textContent = key;
-                label.title = cfg.description || '';
+                const translated = RishuI18n.getSetting(uiLanguage, key, cfg.description || '');
+                label.textContent = translated.label;
+                label.title = `${key} — ${translated.description}`;
+                label.dataset.settingKey = key;
                 let input;
                 switch (cfg.type) {
                     case 'boolean':
@@ -800,6 +927,7 @@
                         input.value = typeof defVal === 'object' ? JSON.stringify(defVal) : defVal;
                 }
                 input.id = `agent-setting-${key}`;
+                input.title = translated.description;
                 input.addEventListener('input', onAgentSettingsChanged);
                 if (input.type === 'checkbox') input.addEventListener('change', onAgentSettingsChanged);
                 wrapper.appendChild(label);
@@ -811,7 +939,7 @@
 
         function openAgentSettings(name) {
             currentAgentName = name;
-            agentSettingsTitle.textContent = `${name} Settings`;
+            agentSettingsTitle.textContent = t('settingsFor', { name });
             fetchAgentSettings(name).then(settings => {
                 originalAgentSettings = JSON.parse(JSON.stringify(settings || {}));
                 buildAgentSettingsForm(settings || {});
@@ -895,6 +1023,17 @@
         closeAgentSettingsBtn.addEventListener('click', closeAgentSettings);
 
 
+        function renderEmptyState() {
+            return `
+                <div class="agent empty-state">
+                    <div>
+                        <div class="empty-state-icon" aria-hidden="true">+</div>
+                        <h3>${t('noAgentsTitle')}</h3>
+                        <p>${t('noAgentsDescription')}</p>
+                    </div>
+                </div>`;
+        }
+
         function renderAgentCard(agent) {
             const cfg = agentSettings[agent.name] || {};
             const showViewer = agent.in_game && cfg.render_bot_view === true;
@@ -903,49 +1042,72 @@
             const lastMessage = agentLastMessage[agent.name] || '';
             const invOpen = inventoryOpen[agent.name] === true;
             const invStyle = invOpen ? '' : 'display:none;';
+            const avatarLabel = String(agent.name || '?').charAt(0).toUpperCase();
+            const connectionLabel = agent.in_game ? t('online') : (agent.socket_connected ? t('connecting') : t('offline'));
             return `
                     <div class="agent" id="agent-${agent.name}">
                         <div class="agent-grid">
-                            <div class="cell title" style="grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between;">
-                                <span><span class="status-icon ${agent.in_game ? 'online' : 'offline'}">●</span>${agent.name}${agent.socket_connected && !agent.in_game ? '<span style="margin-left:6px;color:#f0ad4e;">joining...</span>' : ''}
-                                    <button class="gear-btn" title="Settings" onclick="openAgentSettings('${agent.name}')">⚙</button>
-                                    <button class="gear-btn" title="Inventory" onclick="toggleDetails('${agent.name}')">Inventory</button>
-                                </span>
+                            <div class="cell title agent-card-header" style="grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between;">
+                                <div class="agent-identity">
+                                    <div class="agent-avatar" aria-hidden="true">
+                                        <span class="avatar-fallback">${avatarLabel}</span>
+                                        <span class="avatar-skin">
+                                            <img class="avatar-skin-layer avatar-skin-base" alt="">
+                                            <img class="avatar-skin-layer avatar-skin-overlay" alt="">
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="agent-name-row">${agent.name}</div>
+                                        <div class="agent-status-line">
+                                            <span class="status-icon ${agent.in_game ? 'online' : 'offline'}">●</span>
+                                            <span>${connectionLabel}</span>
+                                            ${agent.socket_connected && !agent.in_game ? `<span class="joining-label">${t('joiningWorld')}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="agent-card-tools">
+                                    <button class="gear-btn" title="${t('settings')}" onclick="openAgentSettings('${agent.name}')">${t('settings')}</button>
+                                    <button class="gear-btn" title="${t('inventory')}" onclick="toggleDetails('${agent.name}')">${t('inventory')}</button>
+                                </div>
                             </div>
-                            ${showViewer ? `<div class="cell" style="grid-row: span 3; padding:0;">${viewerHTML}</div>` : ''}
-                            <div class="cell" id="action-${agent.name}">action: -</div>
-                            <div class="cell" id="mode-${agent.name}">gamemode: -</div>
-                            <div class="cell" id="health-${agent.name}">health: -</div>
-                            <div class="cell" id="hunger-${agent.name}">hunger: -</div>
-                            <div class="cell" id="pos-${agent.name}">pos: -</div>
-                            <div class="cell" id="biome-${agent.name}">biome: -</div>
-                            <div class="cell" id="items-${agent.name}">inventory slots: -</div>
-                            <div class="cell" id="equipped-${agent.name}">equipped: -</div>
+                            ${showViewer ? `<div class="cell viewer-panel" style="grid-column: span 2; grid-row: span 2;">${viewerHTML}</div>` : ''}
+                            <div class="cell metric metric-action" id="action-${agent.name}">${t('idle')}</div>
+                            <div class="cell metric metric-mode" id="mode-${agent.name}">-</div>
+                            <div class="cell metric metric-health" id="health-${agent.name}">-</div>
+                            <div class="cell metric metric-hunger" id="hunger-${agent.name}">-</div>
+                            <div class="cell metric metric-position" id="pos-${agent.name}">-</div>
+                            <div class="cell metric metric-biome" id="biome-${agent.name}">-</div>
+                            <div class="cell metric metric-items" id="items-${agent.name}">-</div>
+                            <div class="cell metric metric-equipped" id="equipped-${agent.name}">-</div>
                             <div class="agent-inventory" id="inventorySection-${agent.name}" style="${invStyle} grid-column: 1 / -1;">
-                                <h3>Inventory</h3>
-                                <div class="cell" id="armor-${agent.name}" style="margin-bottom: 8px;">armor: -</div>
+                                <h3>${t('inventory')}</h3>
+                                <div class="cell" id="armor-${agent.name}" style="margin-bottom: 8px;">${t('armor')}：-</div>
                                 <div class="inventory-grid" id="inventory-${agent.name}"></div>
                             </div>
-                            <div id="lastMessage-${agent.name}" class="last-message" style="grid-column: 1 / -1;"><strong>Last Message:</strong> ${lastMessage}</div>
+                            <div id="lastMessage-${agent.name}" class="last-message" data-label="${t('latest')}" style="grid-column: 1 / -1;">${lastMessage || t('waitingOutput')}</div>
                         </div>
                         <div class="controls-row">
-                            <button class="start-btn" id="sendBtn-${agent.name}" disabled onclick="sendMessage('${agent.name}', document.getElementById('messageInput-${agent.name}').value)">Send</button>
-                            <input class="msg-input" type="text" id="messageInput-${agent.name}" placeholder="Enter message..." 
-                                oninput="onMsgInputChange('${agent.name}')"
-                                onkeydown="if(event.key === 'Enter') document.getElementById('sendBtn-${agent.name}').click()"
-                                ${!agent.in_game ? 'disabled' : ''}>
-                            <button class="neutral-btn" onclick="sendMessage('${agent.name}', '!stop')" ${!agent.in_game ? 'disabled' : ''}>Stop Action</button>
-                            <button class="neutral-btn" onclick="sendMessage('${agent.name}', '!stay(-1)')" ${!agent.in_game ? 'disabled' : ''}>Stay Still</button>
-                            <button class="neutral-btn" onclick="restartAgent('${agent.name}')" ${!agent.in_game ? 'disabled' : ''}>Restart</button>
-                            <button class="neutral-btn" ${agent.in_game ? `onclick=\"disconnectAgent('${agent.name}')\"` : (agent.socket_connected ? 'disabled' : `onclick=\"startAgent('${agent.name}')\"`)}>${agent.in_game ? 'Disconnect' : (agent.socket_connected ? 'Connecting...' : 'Connect')}</button>
-                            <button class="stop-btn" onclick="destroyAgent('${agent.name}')">Remove</button>
+                            <div class="message-composer">
+                                <input class="msg-input" type="text" id="messageInput-${agent.name}" placeholder="${t('messagePlaceholder', { name: agent.name })}"
+                                    oninput="onMsgInputChange('${agent.name}')"
+                                    onkeydown="if(event.key === 'Enter') document.getElementById('sendBtn-${agent.name}').click()"
+                                    ${!agent.in_game ? 'disabled' : ''}>
+                                <button class="start-btn" id="sendBtn-${agent.name}" disabled onclick="sendMessage('${agent.name}', document.getElementById('messageInput-${agent.name}').value)">${t('send')}</button>
+                            </div>
+                            <div class="action-cluster">
+                                <button class="neutral-btn" onclick="sendMessage('${agent.name}', '!stop')" ${!agent.in_game ? 'disabled' : ''}>${t('stopAction')}</button>
+                                <button class="neutral-btn" onclick="sendMessage('${agent.name}', '!stay(-1)')" ${!agent.in_game ? 'disabled' : ''}>${t('stayStill')}</button>
+                                <button class="neutral-btn" onclick="restartAgent('${agent.name}')" ${!agent.in_game ? 'disabled' : ''}>${t('restart')}</button>
+                                <button class="neutral-btn" ${agent.in_game ? `onclick=\"disconnectAgent('${agent.name}')\"` : (agent.socket_connected ? 'disabled' : `onclick=\"startAgent('${agent.name}')\"`)}>${agent.in_game ? t('disconnect') : (agent.socket_connected ? t('connectingButton') : t('connect'))}</button>
+                                <button class="stop-btn" onclick="destroyAgent('${agent.name}')">${t('remove')}</button>
+                            </div>
                         </div>
                     </div>`;
         }
 
         async function renderAgents(agents) {
             if (!agents.length) {
-                agentsDiv.innerHTML = '<div class="agent">No agents connected</div>';
+                agentsDiv.innerHTML = renderEmptyState();
                 return;
             }
 
@@ -956,6 +1118,7 @@
                 setTimeout(() => {
                     agents.forEach(a => {
                         if (a.in_game) updateAgentViewer(a.name);
+                        restoreAgentAvatar(a.name);
                     });
                 }, 0);
                 return;
@@ -975,10 +1138,12 @@
                     // Update existing card
                     el.outerHTML = renderAgentCard(agent);
                     if (agent.in_game) updateAgentViewer(agent.name);
+                    restoreAgentAvatar(agent.name);
                 } else {
                     // Add new card
                     agentsDiv.insertAdjacentHTML('beforeend', renderAgentCard(agent));
                     if (agent.in_game) updateAgentViewer(agent.name);
+                    restoreAgentAvatar(agent.name);
                 }
             });
 
@@ -1013,6 +1178,16 @@
 
             // Update current agents list
             currentAgents = agents;
+            window.currentAgents = currentAgents;
+
+            if (!agents.length) {
+                agentsDiv.innerHTML = renderEmptyState();
+                return;
+            }
+
+            if (agentsDiv.querySelector('.empty-state')) {
+                agentsDiv.innerHTML = '';
+            }
 
             // If agentsDiv is empty, do a full render
             if (!agentsDiv.children.length) {
@@ -1021,6 +1196,7 @@
                 setTimeout(() => {
                     agents.forEach(a => {
                         if (a.in_game) updateAgentViewer(a.name);
+                        restoreAgentAvatar(a.name);
                     });
                 }, 0);
                 return;
@@ -1033,10 +1209,12 @@
                     // Update existing card
                     el.outerHTML = renderAgentCard(agent);
                     if (agent.in_game) updateAgentViewer(agent.name);
+                    restoreAgentAvatar(agent.name);
                 } else {
                     // Add new card
                     agentsDiv.insertAdjacentHTML('beforeend', renderAgentCard(agent));
                     if (agent.in_game) updateAgentViewer(agent.name);
+                    restoreAgentAvatar(agent.name);
                 }
             });
 
@@ -1046,6 +1224,7 @@
                 if (!agents.find(a => a.name === name)) {
                     el.remove();
                     delete inventoryOpen[name];
+                    delete agentSkinUrls[name];
                 }
             });
         });
@@ -1055,7 +1234,7 @@
         function startAgent(n) { 
             const btn = document.querySelector(`button[onclick="startAgent('${n}')"]`);
             if (btn) {
-                btn.textContent = 'Connecting...';
+                btn.textContent = t('connectingButton');
                 btn.disabled = true;
                 // Re-enable after 10s if still disabled (agent failed to connect)
                 setTimeout(() => {
@@ -1064,7 +1243,7 @@
                     const stillWaiting = agentState ? (!agentState.in_game && !agentState.socket_connected) : true;
                     if (retryBtn && stillWaiting) {
                         retryBtn.disabled = false;
-                        retryBtn.textContent = 'Connect';
+                        retryBtn.textContent = t('connect');
                     }
                 }, 10000);
             }
@@ -1076,7 +1255,7 @@
             socket.emit('stop-all-agents'); 
         }
         function confirmShutdown() {
-            if (confirm('Are you sure you want to perform a full shutdown?\nThis will stop all agents and close the server.')) {
+            if (confirm(t('shutdownConfirm'))) {
                 socket.emit('shutdown');
             }
         }
@@ -1095,6 +1274,11 @@
                 btn.disabled = !(input.value && input.value.trim().length > 0);
             }
         }
+
+        document.getElementById('uiLanguageSelect').addEventListener('change', event => {
+            setUiLanguage(event.target.value);
+        });
+        applyTranslations();
 
         function toggleDetails(name) {
             const invSection = document.getElementById(`inventorySection-${name}`);

@@ -120,6 +120,10 @@ export function createMindServer(host_public = false, port = 8080) {
 
         agentsStatusUpdate(socket);
 
+        socket.on('get-agents-status', () => {
+            agentsStatusUpdate(socket);
+        });
+
         socket.on('create-agent', async (settings, callback) => {
             console.log('API create agent...');
             for (let key in settings_spec) {
