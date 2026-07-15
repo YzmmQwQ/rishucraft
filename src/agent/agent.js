@@ -17,6 +17,7 @@ import settings from './settings.js';
 import { Task } from './tasks/tasks.js';
 import { speak } from './speak.js';
 import { log, validateNameFormat, handleDisconnection } from './connection_handler.js';
+import { isOwnChatMessage, rememberOutgoingChat } from './chat_filter.js';
 
 export class Agent {
     async start(load_mem=false, init_message=null, count_id=0) {
@@ -156,7 +157,7 @@ export class Agent {
         
         const respondFunc = async (username, message) => {
             if (message === "") return;
-            if (username === this.name) return;
+            if (isOwnChatMessage(this, username, message)) return;
             if (settings.only_chat_with.length > 0 && !settings.only_chat_with.includes(username)) return;
             try {
                 if (ignore_messages.some((m) => message.startsWith(m))) return;
@@ -212,9 +213,6 @@ export class Agent {
         }
         else if (init_message) {
             await this.handleMessage('system', init_message, 2);
-        }
-        else {
-            this.openChat("Hello world! I am "+this.name);
         }
     }
 
@@ -415,6 +413,7 @@ export class Agent {
         message = message.replaceAll('\n', ' ');
 
         if (settings.only_chat_with.length > 0) {
+            rememberOutgoingChat(this, message);
             for (let username of settings.only_chat_with) {
                 this.bot.whisper(username, message);
             }
@@ -423,7 +422,10 @@ export class Agent {
             if (settings.speak) {
                 speak(to_translate, this.prompter.profile.speak_model);
             }
-            if (settings.chat_ingame) {this.bot.chat(message);}
+            if (settings.chat_ingame) {
+                rememberOutgoingChat(this, message);
+                this.bot.chat(message);
+            }
             sendOutputToServer(this.name, message);
         }
     }
