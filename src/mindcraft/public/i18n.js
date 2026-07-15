@@ -56,6 +56,9 @@
                 waitingOutput: '正在等待智能体输出…',
                 messagePlaceholder: '向 {name} 发送消息…',
                 send: '发送',
+                sending: '发送中…',
+                sent: '已发送',
+                sendFailed: '发送失败',
                 stopAction: '停止动作',
                 stayStill: '保持不动',
                 restart: '重启',
@@ -115,7 +118,7 @@
                 biome: 'biome: {value}', gameMode: 'gamemode: {value}', inventorySlots: 'inventory slots: {used}/{total}',
                 equipped: 'equipped: {value}', none: 'none', armor: 'Armor', head: 'head', chest: 'chest', legs: 'legs',
                 feet: 'feet', mainHand: 'main hand', empty: 'empty', latest: 'LATEST', waitingOutput: 'Waiting for agent output…',
-                messagePlaceholder: 'Message {name}...', send: 'Send', stopAction: 'Stop action', stayStill: 'Stay still',
+                messagePlaceholder: 'Message {name}...', send: 'Send', sending: 'Sending...', sent: 'Sent', sendFailed: 'Failed', stopAction: 'Stop action', stayStill: 'Stay still',
                 restart: 'Restart', disconnect: 'Disconnect', connect: 'Connect', connectingButton: 'Connecting...', remove: 'Remove',
                 shutdownConfirm: 'Are you sure you want to perform a full shutdown?\nThis will stop all agents and close the server.'
             },

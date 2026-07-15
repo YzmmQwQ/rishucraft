@@ -158,7 +158,8 @@ export class Agent {
         const respondFunc = async (username, message) => {
             if (message === "") return;
             if (isOwnChatMessage(this, username, message)) return;
-            if (settings.only_chat_with.length > 0 && !settings.only_chat_with.includes(username)) return;
+            const fromWebAdmin = username === 'ADMIN';
+            if (!fromWebAdmin && settings.only_chat_with.length > 0 && !settings.only_chat_with.includes(username)) return;
             try {
                 if (ignore_messages.some((m) => message.startsWith(m))) return;
 

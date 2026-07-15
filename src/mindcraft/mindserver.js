@@ -259,17 +259,34 @@ export function createMindServer(host_public = false, port = 8080) {
             
         });
 
-		socket.on('send-message', (agentName, data) => {
-			if (!agent_connections[agentName]) {
-				console.warn(`Agent ${agentName} not in game, cannot send message via MindServer.`);
+        socket.on('send-message', (agentName, data, callback = () => {}) => {
+            const agent = agent_connections[agentName];
+            if (!agent || !agent.in_game || !agent.socket) {
+                const error = `Agent ${agentName} is not ready to receive messages.`;
+                console.warn(error);
+                callback({ success: false, error });
                 return;
-			}
-			try {
-                agent_connections[agentName].socket.emit('send-message', data);
-			} catch (error) {
-				console.error('Error: ', error);
-			}
-		});
+            }
+
+            const message = typeof data?.message === 'string' ? data.message.trim() : '';
+            if (!message) {
+                callback({ success: false, error: 'Message cannot be empty.' });
+                return;
+            }
+
+            try {
+                agent.socket.timeout(5000).emit('send-message', { from: 'ADMIN', message }, (error, response) => {
+                    if (error) {
+                        callback({ success: false, error: `Agent ${agentName} did not acknowledge the message.` });
+                        return;
+                    }
+                    callback(response || { success: true });
+                });
+            } catch (error) {
+                console.error('Error forwarding WebUI message:', error);
+                callback({ success: false, error: error.message || String(error) });
+            }
+        });
 
         socket.on('bot-output', (agentName, message) => {
             io.emit('bot-output', agentName, message);

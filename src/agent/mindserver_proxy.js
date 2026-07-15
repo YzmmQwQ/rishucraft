@@ -61,11 +61,24 @@ class MindServerProxy {
             this.agent.cleanKill();
         });
 		
-        this.socket.on('send-message', (data) => {
+        this.socket.on('send-message', (data, callback = () => {}) => {
+            if (!this.agent?.respondFunc) {
+                callback({ success: false, error: 'Agent message handler is not ready.' });
+                return;
+            }
+            if (!data || typeof data.message !== 'string' || !data.message.trim()) {
+                callback({ success: false, error: 'Message cannot be empty.' });
+                return;
+            }
             try {
-                this.agent.respondFunc(data.from, data.message);
+                const handling = this.agent.respondFunc('ADMIN', data.message.trim());
+                Promise.resolve(handling).catch(error => {
+                    console.error('Error handling WebUI message:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+                });
+                callback({ success: true });
             } catch (error) {
                 console.error('Error: ', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+                callback({ success: false, error: error.message || String(error) });
             }
         });
 

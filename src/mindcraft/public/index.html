@@ -1261,11 +1261,30 @@
         }
         function sendMessage(n, m) {
             if (!m || !m.trim()) return;
-            socket.emit('send-message', n, { from: 'ADMIN', message: m });
             const input = document.getElementById(`messageInput-${n}`);
             const btn = document.getElementById(`sendBtn-${n}`);
-            if (input) input.value = '';
-            if (btn) btn.disabled = true;
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = t('sending');
+                btn.title = '';
+            }
+
+            socket.timeout(6000).emit('send-message', n, { message: m.trim() }, (error, response) => {
+                const success = !error && response?.success === true;
+                if (success) {
+                    if (input) input.value = '';
+                    if (btn) btn.textContent = t('sent');
+                } else if (btn) {
+                    btn.textContent = t('sendFailed');
+                    btn.title = response?.error || error?.message || t('sendFailed');
+                }
+
+                setTimeout(() => {
+                    if (!btn) return;
+                    btn.textContent = t('send');
+                    btn.disabled = success || !(input?.value && input.value.trim());
+                }, 1200);
+            });
         }
         function onMsgInputChange(name) {
             const input = document.getElementById(`messageInput-${name}`);
