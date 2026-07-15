@@ -172,7 +172,7 @@ Mindcraft 支持兼容 authlib-injector 的 Yggdrasil 皮肤站。先在 `settin
 如果准备启用 `allow_insecure_coding`，建议在 Docker 容器中运行应用，以降低执行未知代码的风险。连接远程服务器之前强烈建议这样做，但 Docker 仍不能保证绝对安全。
 
 ```bash
-docker build -t mindcraft . && docker run --rm --add-host=host.docker.internal:host-gateway -p 8080:8080 -p 3000-3003:3000-3003 -e SETTINGS_JSON='{"auto_open_ui":false,"profiles":["./profiles/gemini.json"],"host":"host.docker.internal"}' --volume ./keys.json:/app/keys.json --name mindcraft mindcraft
+docker build -t mindcraft . && docker run --rm --add-host=host.docker.internal:host-gateway -p 8080:8080 -p 3000-3003:3000-3003 -e SETTINGS_JSON='{"profiles":["./profiles/gemini.json"],"host":"host.docker.internal"}' --volume ./keys.json:/app/keys.json --name mindcraft mindcraft
 ```
 
 或者直接运行：
